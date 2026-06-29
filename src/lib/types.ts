@@ -54,6 +54,7 @@ export interface BrandConfig {
   socialLinks: BrandSocial[]
   legalText: string
   unsubscribeText: string
+  baseTemplate?: string
 }
 
 export type ProjectStatus = 'draft' | 'analyzing' | 'generating' | 'ready' | 'error'

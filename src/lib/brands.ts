@@ -6,55 +6,129 @@ export const BRANDS: Record<BrandId, BrandConfig> = {
     name: 'citroen',
     displayName: 'Citroën',
     colors: {
-      primary: '#FF4B00',
-      secondary: '#1A1A1A',
-      accent: '#FF4B00',
+      primary: '#E21017',
+      secondary: '#656565',
+      accent: '#E21017',
       background: '#FFFFFF',
-      text: '#1A1A1A',
-      textLight: '#666666',
-      buttonBg: '#FF4B00',
+      text: '#000000',
+      textLight: '#656565',
+      buttonBg: '#E21017',
       buttonText: '#FFFFFF',
-      headerBg: '#1A1A1A',
-      footerBg: '#1A1A1A',
-      footerText: '#FFFFFF',
+      headerBg: '#FFFFFF',
+      footerBg: '#F5F5F5',
+      footerText: '#656565',
     },
     fonts: {
-      heading: { family: 'CitroenType', fallback: 'Arial, sans-serif' },
-      body: { family: 'CitroenType', fallback: 'Arial, sans-serif' },
+      heading: { family: 'Arial', fallback: 'Arial, Helvetica, sans-serif' },
+      body: { family: 'Arial', fallback: 'Arial, Helvetica, sans-serif' },
     },
     logoUrl: '/brands/citroen/logo.png',
-    logoWidth: 120,
-    headerHeight: 80,
+    logoWidth: 250,
+    headerHeight: 0,
     buttonStyle: {
       borderRadius: '0px',
-      padding: '14px 32px',
-      fontSize: '14px',
+      padding: '0 24px',
+      fontSize: '24px',
       fontWeight: '700',
       textTransform: 'uppercase',
     },
+    baseTemplate: 'citroen',
     footer: {
-      backgroundColor: '#1A1A1A',
-      textColor: '#FFFFFF',
+      backgroundColor: '#F5F5F5',
+      textColor: '#656565',
       html: `
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#1A1A1A;">
+        <!-- FOOTER CITROËN -->
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <!-- Central de Serviços -->
           <tr>
-            <td align="center" style="padding:30px 40px 20px;">
-              <img src="/brands/citroen/logo-white.png" width="100" alt="Citroën" style="display:block;"/>
+            <td width="600" bgcolor="#F5F5F5" align="center"
+              style="color:#656565;font-family:Arial,Helvetica,sans-serif;font-size:20px;line-height:1.2;padding:0 40px;text-align:center;font-weight:bold;">
+              CENTRAL DE SERVIÇOS AO CLIENTE
             </td>
           </tr>
+          <!-- WhatsApp + Telefone -->
           <tr>
-            <td align="center" style="padding:0 40px 16px;">
-              <a href="#" style="display:inline-block;margin:0 8px;"><img src="/brands/citroen/social-facebook.png" width="24" alt="Facebook"/></a>
-              <a href="#" style="display:inline-block;margin:0 8px;"><img src="/brands/citroen/social-instagram.png" width="24" alt="Instagram"/></a>
-              <a href="#" style="display:inline-block;margin:0 8px;"><img src="/brands/citroen/social-youtube.png" width="24" alt="YouTube"/></a>
+            <td width="600" bgcolor="#F5F5F5" align="center">
+              <table width="600" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" style="padding-top:20px;padding-left:64px;" width="300">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="vertical-align:middle;font-family:Arial,Helvetica,sans-serif;font-size:20px;line-height:1.2;color:#656565;">
+                          <b>WHATSAPP CITROËN</b><br>
+                          <span style="font-size:16px;">(31) 2123-2300</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td align="right" style="padding-top:20px;padding-right:64px;" width="300">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="vertical-align:middle;font-family:Arial,Helvetica,sans-serif;font-size:20px;line-height:1.2;color:#656565;">
+                          <b>TELEFONE</b><br>
+                          <span style="font-size:16px;">0800 011 8088</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
+          <!-- Divider -->
           <tr>
-            <td align="center" style="padding:0 40px 20px;font-family:Arial,sans-serif;font-size:11px;color:#999999;line-height:1.6;">
-              © {{year}} Citroën Brasil — Todos os direitos reservados.<br/>
-              Citroën do Brasil Automóveis Ltda. | CNPJ: 00.000.000/0000-00<br/>
-              <a href="#" style="color:#FF4B00;text-decoration:none;">Descadastrar</a> ·
-              <a href="#" style="color:#FF4B00;text-decoration:none;">Política de Privacidade</a>
+            <td width="600" bgcolor="#F5F5F5" align="center" style="padding:20px 60px;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr><td bgcolor="#CCCCCC" style="height:1px;font-size:0;line-height:0;">&nbsp;</td></tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Redes sociais -->
+          <tr>
+            <td width="600" bgcolor="#F5F5F5" align="center">
+              <table width="500" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" style="font-size:0;padding:20px 0;">
+                    <a href="https://www.facebook.com/citroen.brasil" style="display:inline-block;padding:0 32px;" target="_blank">
+                      <img src="https://image.relacionamento.citroen.com.br/lib/fe3411727564047f761378/m/1/21774aad-7fb4-4efb-9bf2-d605d5c0fd7e.png" alt="Facebook" width="40" style="display:block;">
+                    </a>
+                    <a href="https://www.instagram.com/citroenbrasil" style="display:inline-block;padding:0 32px;" target="_blank">
+                      <img src="https://image.relacionamento.citroen.com.br/lib/fe3411727564047f761378/m/1/a621943b-b668-4704-8a24-7c48364df93b.png" alt="Instagram" width="40" style="display:block;">
+                    </a>
+                    <a href="https://www.youtube.com/citroenbrasil" style="display:inline-block;padding:0 32px;" target="_blank">
+                      <img src="https://image.relacionamento.citroen.com.br/lib/fe3411727564047f761378/m/1/beef8f4c-b5b8-4bcf-943f-fd5c97703b69.png" alt="Youtube" width="40" style="display:block;">
+                    </a>
+                    <a href="https://x.com/citroenbrasil" style="display:inline-block;padding:0 32px;" target="_blank">
+                      <img src="https://image.relacionamento.citroen.com.br/lib/fe3411727564047f761378/m/1/d4cd3d5c-a175-4cc2-ac8b-457093873f91.png" alt="X" width="40" style="display:block;">
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- IBAMA + logo -->
+          <tr>
+            <td width="600" bgcolor="#F5F5F5">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="left" style="padding:20px 32px;">
+                    <span style="font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:1.3;color:#000000;">
+                      Desacelere. Seu bem maior é a vida.
+                    </span>
+                  </td>
+                  <td align="right" style="padding:20px 32px;">
+                    <img src="https://image.relacionamento.citroen.com.br/lib/fe3411727564047f761378/m/1/b843115a-2883-423f-ae68-a6fa6f36ec15.png"
+                      alt="Citroën" width="160" style="display:block;">
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Legal -->
+          <tr>
+            <td width="600" bgcolor="#F5F5F5"
+              style="font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.2;color:#000000;padding:24px 32px 50px;text-align:left;">
+              {{legalText}}
             </td>
           </tr>
         </table>`,
@@ -385,7 +459,7 @@ export function getBrand(id: BrandId): BrandConfig {
 export const BRAND_LIST = Object.values(BRANDS)
 
 export const BRAND_COLORS_MAP: Record<BrandId, string> = {
-  citroen: '#FF4B00',
+  citroen: '#E21017',
   fiat: '#C8102E',
   jeep: '#2C5F2E',
   peugeot: '#0F2D6E',

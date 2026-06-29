@@ -42,21 +42,36 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
         </td>
       </tr>`
 
-    case 'cta':
+    case 'cta': {
+      const btnBg = c.buttonBg || colors.buttonBg
+      const btnColor = c.buttonColor || colors.buttonText
+      const btnText = c.buttonText || 'Saiba Mais'
+      const btnUrl = c.buttonUrl || '#'
+      const btnRadius = buttonStyle.borderRadius
+      const btnFs = buttonStyle.fontSize
+      const btnFw = buttonStyle.fontWeight
+      const btnTt = buttonStyle.textTransform
+      const btnPad = buttonStyle.padding
       return `
       <!-- CTA -->
       <tr>
         <td align="center" style="padding:${c.padding || '24px 40px'};background-color:${c.bg || colors.background};">
           ${c.text ? `<p style="margin:0 0 20px;font-family:${fonts.body.fallback};font-size:15px;color:${c.textColor || colors.textLight};text-align:center;">${c.text}</p>` : ''}
-          <table cellpadding="0" cellspacing="0" border="0">
-            <tr>
-              <td align="center" style="border-radius:${buttonStyle.borderRadius};background-color:${c.buttonBg || colors.buttonBg};">
-                <a href="${c.buttonUrl || '#'}" style="display:inline-block;padding:${buttonStyle.padding};font-family:${fonts.heading.fallback};font-size:${buttonStyle.fontSize};font-weight:${buttonStyle.fontWeight};color:${c.buttonColor || colors.buttonText};text-decoration:none;text-transform:${buttonStyle.textTransform};border-radius:${buttonStyle.borderRadius};background-color:${c.buttonBg || colors.buttonBg};">${c.buttonText || 'Saiba Mais'}</a>
-              </td>
-            </tr>
-          </table>
+          <!--[if mso]>
+          <v:rect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+            href="${btnUrl}" style="height:49px;v-text-anchor:middle;width:280px;"
+            fillcolor="${btnBg}" strokecolor="${btnBg}" strokeweight="0pt">
+            <w:anchorlock/>
+            <center style="color:${btnColor};font-family:Arial,sans-serif;font-size:${btnFs};font-weight:${btnFw};text-transform:${btnTt};white-space:nowrap;">${btnText}</center>
+          </v:rect>
+          <![endif]-->
+          <!--[if !mso]><!-->
+          <a href="${btnUrl}" target="_blank"
+            style="white-space:nowrap;background-color:${btnBg};border-radius:${btnRadius};display:inline-block;text-align:center;text-decoration:none;color:${btnColor};font-weight:${btnFw};font-family:${fonts.heading.fallback};font-size:${btnFs};text-transform:${btnTt};line-height:49px;padding:${btnPad};mso-hide:all;-webkit-text-size-adjust:none;">${btnText}</a>
+          <!--<![endif]-->
         </td>
       </tr>`
+    }
 
     case 'banner':
       return `
