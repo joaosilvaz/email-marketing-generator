@@ -37,18 +37,20 @@
                 <!--[if mso]>
                 <v:rect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
                     target="_blank" href="{{ctaUrl}}"
-                    style="height:55px;v-text-anchor:middle;width:545px;"
-                    fillcolor="#00A3E0" stroke="f">
+                    style="height:55px; v-text-anchor:middle; width:545px;"
+                    fillcolor="#00A3E0" strokecolor="#FFFFFF" strokeweight="1pt">
                     <w:anchorlock/>
                     <center class="txt" style="white-space:nowrap;display:inline-block;text-align:center;text-decoration:none;color:#FFFFFF;font-weight:700;font-family:Arial,Arial,sans-serif;font-size:32px;text-transform:uppercase;">
                         {{ctaText1}}
                     </center>
                 </v:rect>
                 <![endif]-->
+                <!--[if !mso]><!-->
                 <a href="{{ctaUrl}}" target="_blank" class="txt"
                     style="white-space:nowrap;background-color:#00A3E0;display:inline-block;text-align:center;text-decoration:none;color:#FFFFFF;font-weight:700;font-family:Arial,Arial,sans-serif;font-size:32px;text-transform:uppercase;line-height:55px;width:545px;-webkit-text-size-adjust:none;mso-hide:all">
                     {{ctaText1}}
                 </a>
+                <!--<![endif]-->
             </td>
         </tr>
     </table>
@@ -144,13 +146,15 @@
                                 <!--[if mso]>
                                 <v:rect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
                                     href="{{sideBannerCtaUrl}}"
-                                    style="height:43px;v-text-anchor:middle;width:140px;" fillcolor="#00a3e0" stroke="f">
+                                    style="height:43px; v-text-anchor:middle; width:140px;" fillcolor="#00a3e0" strokecolor="#FFFFFF" strokeweight="1pt">
                                     <w:anchorlock/>
                                     <center style="white-space:nowrap;display:inline-block;text-align:center;text-decoration:none;color:#ffffff;font-weight:700;font-family:Arial,sans-serif;font-size:16px;text-transform:uppercase;">{{sideBannerCtaText}}</center>
                                 </v:rect>
                                 <![endif]-->
-                                <a href="{{sideBannerCtaUrl}}"
+                                <!--[if !mso]><!-->
+                                <a href="{{sideBannerCtaUrl}}" target="_blank"
                                     style="mso-hide:all;white-space:nowrap;background-color:#00a3e0;display:inline-block;text-align:center;text-decoration:none;color:#ffffff;font-weight:700;font-family:Arial,sans-serif;font-size:16px;text-transform:uppercase;line-height:43px;width:140px;-webkit-text-size-adjust:none;">{{sideBannerCtaText}}</a>
+                                <!--<![endif]-->
                             </div>
                         </td>
                     </tr>
