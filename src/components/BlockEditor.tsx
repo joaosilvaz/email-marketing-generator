@@ -2,7 +2,20 @@
 
 import { useState } from 'react'
 import { EmailBlock } from '@/lib/types'
-import { ChevronDown, ChevronUp, Trash2, GripVertical, Plus } from 'lucide-react'
+import { ChevronDown, ChevronUp, Trash2, GripVertical, Plus, Upload, Loader2 } from 'lucide-react'
+
+function isImageField(key: string): boolean {
+  return /image|logoUrl/i.test(key)
+}
+
+async function uploadFile(file: File): Promise<string> {
+  const fd = new FormData()
+  fd.append('file', file)
+  const res = await fetch('/api/upload', { method: 'POST', body: fd })
+  if (!res.ok) throw new Error('Falha no upload')
+  const data = await res.json() as { url: string }
+  return data.url
+}
 
 const BLOCK_LABELS: Record<string, string> = {
   header: 'Cabeçalho',
@@ -58,6 +71,70 @@ interface Props {
   onChange: (blocks: EmailBlock[]) => void
 }
 
+function ImageFieldEditor({
+  fieldKey,
+  value,
+  onChange,
+}: {
+  fieldKey: string
+  value: string
+  onChange: (v: string) => void
+}) {
+  const [uploading, setUploading] = useState(false)
+
+  const handleFile = async (file: File | undefined) => {
+    if (!file) return
+    setUploading(true)
+    try {
+      const url = await uploadFile(file)
+      onChange(url)
+    } catch {
+      // silenciosamente ignora — usuário pode tentar de novo
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const isPlaceholder = value.includes('via.placeholder.com') || !value
+
+  return (
+    <div>
+      <label className="text-xs text-zinc-500 block mb-1">{FIELD_LABELS[fieldKey] || fieldKey}</label>
+      <div className="flex gap-2 items-start">
+        {value && !isPlaceholder && (
+          <img
+            src={value}
+            alt=""
+            className="w-12 h-12 object-cover rounded border border-zinc-700 flex-shrink-0"
+            onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+          />
+        )}
+        <div className="flex-1 space-y-1.5">
+          <input
+            value={value}
+            onChange={e => onChange(e.target.value)}
+            placeholder="Cole uma URL ou faça upload"
+            className="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-white text-xs focus:outline-none focus:border-blue-500"
+          />
+          <label className="flex items-center justify-center gap-1.5 w-full py-1.5 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded text-xs text-zinc-300 cursor-pointer transition-colors">
+            {uploading ? <Loader2 size={11} className="animate-spin" /> : <Upload size={11} />}
+            {uploading ? 'Enviando...' : 'Upload de imagem'}
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={e => handleFile(e.target.files?.[0])}
+            />
+          </label>
+        </div>
+      </div>
+      {isPlaceholder && (
+        <p className="text-amber-500/80 text-xs mt-1">⚠ Placeholder — envie a imagem real</p>
+      )}
+    </div>
+  )
+}
+
 function BlockFieldEditor({
   content,
   onChange,
@@ -66,26 +143,35 @@ function BlockFieldEditor({
   onChange: (c: Record<string, unknown>) => void
 }) {
   return (
-    <div className="space-y-2 px-4 pb-4">
-      {Object.entries(content).map(([key, val]) => (
-        <div key={key}>
-          <label className="text-xs text-zinc-500 block mb-1">{FIELD_LABELS[key] || key}</label>
-          {String(val).length > 80 ? (
-            <textarea
-              value={String(val)}
-              rows={3}
-              onChange={e => onChange({ ...content, [key]: e.target.value })}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-white text-xs focus:outline-none focus:border-blue-500 resize-none"
-            />
-          ) : (
-            <input
-              value={String(val)}
-              onChange={e => onChange({ ...content, [key]: e.target.value })}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-white text-xs focus:outline-none focus:border-blue-500"
-            />
-          )}
-        </div>
-      ))}
+    <div className="space-y-3 px-4 pb-4">
+      {Object.entries(content).map(([key, val]) =>
+        isImageField(key) ? (
+          <ImageFieldEditor
+            key={key}
+            fieldKey={key}
+            value={String(val)}
+            onChange={v => onChange({ ...content, [key]: v })}
+          />
+        ) : (
+          <div key={key}>
+            <label className="text-xs text-zinc-500 block mb-1">{FIELD_LABELS[key] || key}</label>
+            {String(val).length > 80 ? (
+              <textarea
+                value={String(val)}
+                rows={3}
+                onChange={e => onChange({ ...content, [key]: e.target.value })}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-white text-xs focus:outline-none focus:border-blue-500 resize-none"
+              />
+            ) : (
+              <input
+                value={String(val)}
+                onChange={e => onChange({ ...content, [key]: e.target.value })}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-white text-xs focus:outline-none focus:border-blue-500"
+              />
+            )}
+          </div>
+        )
+      )}
     </div>
   )
 }

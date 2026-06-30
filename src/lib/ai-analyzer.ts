@@ -20,6 +20,8 @@ REGRAS CRÍTICAS DE EXTRAÇÃO DE TEXTO:
 9. Se houver 3 ou mais itens lado a lado com imagem + texto curto cada (formato "card"), use o tipo "cards". Se houver exatamente 2 colunas de conteúdo (imagem+texto cada), use "columns2". Se houver exatamente 3 colunas, use "columns3".
 10. Preserve a ORDEM EXATA em que os blocos aparecem na imagem, de cima para baixo. O campo "order" deve refletir essa ordem (0, 1, 2, 3...).
 11. Não pule nenhuma seção visível, mesmo que pareça repetida ou pouco importante (ex: múltiplos banners de produtos similares devem virar múltiplos blocos "banner" separados, um para cada).
+12. NEGRITO: se uma palavra ou trecho estiver visualmente em negrito (mais grosso que o texto ao redor), marque envolvendo com **dois asteriscos**, exemplo: "Você e mais um acompanhante são **convidados especiais**". Não marque como negrito texto que não está em negrito.
+13. QUEBRAS DE LINHA: reproduza as quebras de linha exatamente como estão na imagem usando "\\n" (uma quebra) entre linhas dentro do mesmo parágrafo, e "\\n\\n" entre parágrafos diferentes. Preste atenção em onde o texto realmente quebra de linha no design — não junte tudo em uma linha só nem invente quebras que não existem.
 
 Tipos de bloco disponíveis e quando usar cada um:
 - hero: imagem principal/banner do topo (pode ter texto sobreposto na própria imagem)
@@ -46,17 +48,17 @@ Retorne SOMENTE um JSON válido com esta estrutura:
   "rawDescription": "descrição do layout"
 }
 
-Campos por tipo:
+Campos por tipo (todos os campos de texto devem usar **negrito** e \\n conforme as regras 12 e 13 acima):
 - hero: { "imageUrl": "", "link": "#", "alt": "descreva inclusive qualquer texto sobreposto na imagem" }
-- text: { "headline": "texto exato e completo", "body": "texto exato e completo, sem cortes" }
+- text: { "headline": "texto exato e completo, com **negrito** e \\n onde houver", "body": "texto exato e completo, sem cortes, com **negrito** e \\n onde houver" }
 - cta: { "buttonText": "texto exato do botão", "buttonUrl": "#", "text": "" }
 - banner: { "imageUrl": "", "link": "#", "alt": "" }
-- bannerText: { "imageUrl": "", "headline": "título", "body": "texto completo", "buttonText": "botão", "buttonUrl": "#" }
-- list: { "title": "título da seção", "items": "item 1\\nitem 2\\nitem 3" (um item por linha, separados por \\n), "ordered": "true ou false", "imageUrl": "" }
+- bannerText: { "imageUrl": "", "headline": "título", "body": "texto completo, com **negrito** e \\n onde houver", "buttonText": "botão", "buttonUrl": "#" }
+- list: { "title": "título da seção", "items": "item 1\\nitem 2\\nitem 3" (um item por linha, separados por \\n; use **negrito** dentro do item se houver), "ordered": "true ou false", "imageUrl": "" }
 - cards: { "title": "título da seção (opcional)", "card1Image": "", "card1Text": "texto exato", "card2Image": "", "card2Text": "texto exato", "card3Image": "", "card3Text": "texto exato" }
 - columns2: { "col1Image": "", "col1Text": "texto exato", "col2Image": "", "col2Text": "texto exato" }
 - columns3: { "col1Image": "", "col1Text": "", "col2Image": "", "col2Text": "", "col3Image": "", "col3Text": "" }
-- footer: { "legalText": "texto legal completo e exato, palavra por palavra, sem resumir nem cortar" }
+- footer: { "legalText": "texto legal completo e exato, palavra por palavra, sem resumir nem cortar, com **negrito** e \\n onde houver" }
 
 Retorne APENAS o JSON, sem markdown, sem comentários, sem truncar a resposta.`
 

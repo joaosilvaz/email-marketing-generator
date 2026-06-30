@@ -28,6 +28,24 @@ function injectUnsubscribe(html: string): string {
   return cleaned + UNSUBSCRIBE_BLOCK
 }
 
+// ─── Formatação de texto (negrito + quebras de linha) ──────────────────────────
+// A IA marca negrito com **texto** e preserva quebras de linha com \n.
+// Aqui convertemos isso em HTML real: **texto** → <b>texto</b>, \n → <br>
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
+function formatText(text: string | undefined): string {
+  if (!text) return ''
+  return escapeHtml(text)
+    .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+    .replace(/\n/g, '<br>')
+}
+
 // ─── Template loader ───────────────────────────────────────────────────────────
 
 function loadBaseTemplate(brandId: string): string | null {
@@ -67,13 +85,13 @@ function renderListBlock(block: EmailBlock, brand: BrandConfig): string {
           <span style="font-family:${fonts.body.fallback};font-size:14px;color:${colors.primary};font-weight:700;">${ordered ? `${i + 1}.` : '•'}</span>
         </td>
         <td style="padding:0 0 8px;vertical-align:top;">
-          <span style="font-family:${fonts.body.fallback};font-size:14px;color:${colors.text};line-height:1.5;">${item}</span>
+          <span style="font-family:${fonts.body.fallback};font-size:14px;color:${colors.text};line-height:1.5;">${formatText(item)}</span>
         </td>
       </tr>`)
     .join('')
 
   const listContent = `
-    ${c.title ? `<p style="margin:0 0 14px;font-family:${fonts.heading.fallback};font-size:20px;color:${colors.primary};font-weight:700;text-transform:uppercase;">${c.title}</p>` : ''}
+    ${c.title ? `<p style="margin:0 0 14px;font-family:${fonts.heading.fallback};font-size:20px;color:${colors.primary};font-weight:700;text-transform:uppercase;">${formatText(c.title)}</p>` : ''}
     <table cellpadding="0" cellspacing="0" border="0">${itemsHtml}</table>`
 
   if (c.imageUrl) {
@@ -162,12 +180,12 @@ export function generateFromTemplate(
     .replace(/\{\{ctaProductButtonAlt\}\}/g,    content(cta1).buttonText         || 'Saiba Mais')
 
     // ── Intro text ────────────────────────────────────────────────────────────
-    .replace(/\{\{introText\}\}/g,           content(intro).body       || '')
-    .replace(/\{\{personalizationName\}\}/g, content(intro).headline   || '%Nome%,')
+    .replace(/\{\{introText\}\}/g,           formatText(content(intro).body)       || '')
+    .replace(/\{\{personalizationName\}\}/g, formatText(content(intro).headline)   || '%Nome%,')
 
     // ── Section title / body ──────────────────────────────────────────────────
-    .replace(/\{\{sectionTitle\}\}/g, content(section).headline || content(section).body || '')
-    .replace(/\{\{bodyText\}\}/g,     content(body).body        || content(body).headline || '')
+    .replace(/\{\{sectionTitle\}\}/g, formatText(content(section).headline || content(section).body) || '')
+    .replace(/\{\{bodyText\}\}/g,     formatText(content(body).body        || content(body).headline) || '')
 
     // ── Banners ───────────────────────────────────────────────────────────────
     .replace(/\{\{banner1Image\}\}/g, content(banner1).imageUrl || 'https://via.placeholder.com/600x200')
@@ -189,48 +207,48 @@ export function generateFromTemplate(
 
     // ── Side banner (bannerText) ───────────────────────────────────────────────
     .replace(/\{\{sideBannerImage\}\}/g,   content(sideBlock).imageUrl   || 'https://via.placeholder.com/300x330')
-    .replace(/\{\{sideBannerTitle\}\}/g,   content(sideBlock).headline   || '')
-    .replace(/\{\{sideBannerText\}\}/g,    content(sideBlock).body       || '')
+    .replace(/\{\{sideBannerTitle\}\}/g,   formatText(content(sideBlock).headline)   || '')
+    .replace(/\{\{sideBannerText\}\}/g,    formatText(content(sideBlock).body)       || '')
     .replace(/\{\{sideBannerCtaText\}\}/g, content(sideBlock).buttonText || 'Saiba Mais')
     .replace(/\{\{sideBannerCtaUrl\}\}/g,  content(sideBlock).buttonUrl  || content(cta1).buttonUrl || '#')
 
     // ── Jeep dark section ─────────────────────────────────────────────────────
-    .replace(/\{\{darkSectionTitle\}\}/g, content(section ?? body ?? intro).headline || '')
-    .replace(/\{\{darkSectionText\}\}/g,  content(section ?? body ?? intro).body     || '')
+    .replace(/\{\{darkSectionTitle\}\}/g, formatText(content(section ?? body ?? intro).headline) || '')
+    .replace(/\{\{darkSectionText\}\}/g,  formatText(content(section ?? body ?? intro).body)     || '')
     .replace(/\{\{darkSectionImage\}\}/g, content(banner2 ?? banner1).imageUrl       || 'https://via.placeholder.com/600x300')
     .replace(/\{\{darkCtaImage\}\}/g,     content(cta2 ?? cta1).buttonImage          || 'https://via.placeholder.com/335x49')
     .replace(/\{\{darkCtaText\}\}/g,      content(cta2 ?? cta1).buttonText           || 'Saiba Mais')
     .replace(/\{\{jeepLogoWhite\}\}/g,    '/brands/jeep/logo-white.png')
 
     // Jeep col (text+image side by side sections)
-    .replace(/\{\{col1Title\}\}/g,  content(texts[1]).headline  || '')
-    .replace(/\{\{col1Text\}\}/g,   content(texts[1]).body      || '')
+    .replace(/\{\{col1Title\}\}/g,  formatText(content(texts[1]).headline)  || '')
+    .replace(/\{\{col1Text\}\}/g,   formatText(content(texts[1]).body)      || '')
     .replace(/\{\{col1Image\}\}/g,  content(banner1).imageUrl   || 'https://via.placeholder.com/300x300')
     .replace(/\{\{col1Alt\}\}/g,    content(banner1).alt        || '')
-    .replace(/\{\{col2Title\}\}/g,  content(texts[2]).headline  || '')
-    .replace(/\{\{col2Text\}\}/g,   content(texts[2]).body      || '')
+    .replace(/\{\{col2Title\}\}/g,  formatText(content(texts[2]).headline)  || '')
+    .replace(/\{\{col2Text\}\}/g,   formatText(content(texts[2]).body)      || '')
     .replace(/\{\{col2Image\}\}/g,  content(banner2).imageUrl   || 'https://via.placeholder.com/300x300')
     .replace(/\{\{col2Alt\}\}/g,    content(banner2).alt        || '')
 
     // ── RAM specific ──────────────────────────────────────────────────────────
-    .replace(/\{\{tagline\}\}/g,         content(intro).headline || brand.displayName.toUpperCase())
+    .replace(/\{\{tagline\}\}/g,         formatText(content(intro).headline) || brand.displayName.toUpperCase())
     .replace(/\{\{vehicleImage\}\}/g,    content(banner1).imageUrl || 'https://via.placeholder.com/280x200')
     .replace(/\{\{vehicleAlt\}\}/g,      content(banner1).alt      || brand.displayName)
-    .replace(/\{\{priceLabel\}\}/g,      content(texts[1]).headline || 'A PARTIR DE:')
-    .replace(/\{\{price\}\}/g,           content(texts[1]).body     || 'Consulte')
-    .replace(/\{\{priceSubtitle\}\}/g,   content(texts[2]).body     || '')
-    .replace(/\{\{priceDisclaimer\}\}/g, content(texts[3]).body     || '*CONSULTE CONDIÇÕES')
+    .replace(/\{\{priceLabel\}\}/g,      formatText(content(texts[1]).headline) || 'A PARTIR DE:')
+    .replace(/\{\{price\}\}/g,           formatText(content(texts[1]).body)     || 'Consulte')
+    .replace(/\{\{priceSubtitle\}\}/g,   formatText(content(texts[2]).body)     || '')
+    .replace(/\{\{priceDisclaimer\}\}/g, formatText(content(texts[3]).body)     || '*CONSULTE CONDIÇÕES')
     .replace(/\{\{dividerImage\}\}/g,    'https://via.placeholder.com/600x8')
 
     // ── Leapmotor specific ────────────────────────────────────────────────────
-    .replace(/\{\{sideBannerTitle\}\}/g, content(sideBlock ?? texts[1]).headline || '')
-    .replace(/\{\{sideBannerText\}\}/g,  content(sideBlock ?? texts[1]).body     || '')
+    .replace(/\{\{sideBannerTitle\}\}/g, formatText(content(sideBlock ?? texts[1]).headline) || '')
+    .replace(/\{\{sideBannerText\}\}/g,  formatText(content(sideBlock ?? texts[1]).body)     || '')
 
     // ── Blocos extras (list, cards, etc — sem placeholder fixo) ────────────────
     .replace(/\{\{extraBlocks\}\}/g, renderExtraBlocks(sorted, brand))
 
     // ── Legal / footer ────────────────────────────────────────────────────────
-    .replace(/\{\{legalText\}\}/g, legalText || content(blocksByType(sorted, 'footer')[0]).legalText || brand.legalText || 'Desacelere. Seu bem maior é a vida.')
+    .replace(/\{\{legalText\}\}/g, formatText(legalText || content(blocksByType(sorted, 'footer')[0]).legalText) || brand.legalText || 'Desacelere. Seu bem maior é a vida.')
     .replace(/\{\{year\}\}/g, String(new Date().getFullYear()))
     .replace(/\{\{unsubscribeUrl\}\}/g, '%%unsub_center_url%%')
 
@@ -278,8 +296,8 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
       return `
       <tr>
         <td style="padding:${c.padding || '32px 40px'};background-color:${c.bg || colors.background};">
-          ${c.headline ? `<p style="margin:0 0 12px;font-family:${fonts.heading.fallback};font-size:${c.headlineSize || '22px'};color:${colors.text};font-weight:700;line-height:1.3;">${c.headline}</p>` : ''}
-          ${c.body ? `<p style="margin:0;font-family:${fonts.body.fallback};font-size:${c.bodySize || '20px'};color:${colors.textLight};line-height:1.4;">${c.body}</p>` : ''}
+          ${c.headline ? `<p style="margin:0 0 12px;font-family:${fonts.heading.fallback};font-size:${c.headlineSize || '22px'};color:${colors.text};font-weight:700;line-height:1.3;">${formatText(c.headline)}</p>` : ''}
+          ${c.body ? `<p style="margin:0;font-family:${fonts.body.fallback};font-size:${c.bodySize || '20px'};color:${colors.textLight};line-height:1.4;">${formatText(c.body)}</p>` : ''}
         </td>
       </tr>`
 
@@ -296,7 +314,7 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
       return `
       <tr>
         <td style="padding:${c.padding || '24px 40px'};background-color:${sectionBg};" align="center">
-          ${c.text ? `<p style="margin:0 0 16px;font-family:${fonts.body.fallback};font-size:20px;color:${colors.textLight};text-align:center;">${c.text}</p>` : ''}
+          ${c.text ? `<p style="margin:0 0 16px;font-family:${fonts.body.fallback};font-size:20px;color:${colors.textLight};text-align:center;">${formatText(c.text)}</p>` : ''}
           <div>
             <!--[if mso]>
             <v:rect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
@@ -337,8 +355,8 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
                 <img src="${c.imageUrl || 'https://via.placeholder.com/300x280'}" width="300" alt="${c.alt || ''}" style="display:block;border:0;"/>
               </td>
               <td width="300" valign="middle" style="padding:24px 32px;background-color:${c.bg || colors.background};">
-                ${c.headline ? `<p style="margin:0 0 12px;font-family:${fonts.heading.fallback};font-size:22px;color:${colors.primary};font-weight:700;line-height:1.3;">${c.headline}</p>` : ''}
-                ${c.body ? `<p style="margin:0 0 20px;font-family:${fonts.body.fallback};font-size:16px;color:${colors.text};line-height:1.5;">${c.body}</p>` : ''}
+                ${c.headline ? `<p style="margin:0 0 12px;font-family:${fonts.heading.fallback};font-size:22px;color:${colors.primary};font-weight:700;line-height:1.3;">${formatText(c.headline)}</p>` : ''}
+                ${c.body ? `<p style="margin:0 0 20px;font-family:${fonts.body.fallback};font-size:16px;color:${colors.text};line-height:1.5;">${formatText(c.body)}</p>` : ''}
                 ${c.buttonText ? `
                   <!--[if mso]>
                   <v:rect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
@@ -386,7 +404,7 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
           <td width="${Math.floor(100 / cardItems.length)}%" valign="top" style="padding:0 8px;">
             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${colors.background};border-radius:4px;overflow:hidden;">
               ${card.img ? `<tr><td><img src="${card.img}" width="170" style="display:block;width:100%;border:0;"/></td></tr>` : ''}
-              ${card.text ? `<tr><td style="padding:12px;font-family:${fonts.body.fallback};font-size:13px;color:${colors.text};">${card.text}</td></tr>` : ''}
+              ${card.text ? `<tr><td style="padding:12px;font-family:${fonts.body.fallback};font-size:13px;color:${colors.text};">${formatText(card.text)}</td></tr>` : ''}
             </table>
           </td>`)
         .join('')
@@ -394,7 +412,7 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
       return `
       <tr>
         <td style="padding:24px 20px;background-color:${colors.background};">
-          ${c.title ? `<p style="text-align:center;font-family:${fonts.heading.fallback};font-size:20px;color:${colors.primary};margin:0 0 20px;font-weight:700;">${c.title}</p>` : ''}
+          ${c.title ? `<p style="text-align:center;font-family:${fonts.heading.fallback};font-size:20px;color:${colors.primary};margin:0 0 20px;font-weight:700;">${formatText(c.title)}</p>` : ''}
           <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>${cardsHtml}</tr></table>
         </td>
       </tr>`
@@ -409,7 +427,7 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
         .map(col => `
           <td width="300" valign="top" style="padding:0;font-size:0;line-height:0;">
             ${col.img ? `<img src="${col.img}" width="300" style="display:block;border:0;width:100%;"/>` : ''}
-            ${col.text ? `<div style="padding:16px;font-size:14px;font-family:${fonts.body.fallback};color:${colors.text};line-height:1.5;">${col.text}</div>` : ''}
+            ${col.text ? `<div style="padding:16px;font-size:14px;font-family:${fonts.body.fallback};color:${colors.text};line-height:1.5;">${formatText(col.text)}</div>` : ''}
           </td>`)
         .join('')
       return `
@@ -430,7 +448,7 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
         .map(col => `
           <td width="200" valign="top" style="padding:0;font-size:0;line-height:0;">
             ${col.img ? `<img src="${col.img}" width="200" style="display:block;border:0;width:100%;"/>` : ''}
-            ${col.text ? `<div style="padding:12px;font-size:13px;font-family:${fonts.body.fallback};color:${colors.text};line-height:1.5;">${col.text}</div>` : ''}
+            ${col.text ? `<div style="padding:12px;font-size:13px;font-family:${fonts.body.fallback};color:${colors.text};line-height:1.5;">${formatText(col.text)}</div>` : ''}
           </td>`)
         .join('')
       return `
