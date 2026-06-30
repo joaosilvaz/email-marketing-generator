@@ -1,51 +1,80 @@
 import Anthropic from '@anthropic-ai/sdk'
+import OpenAI from 'openai'
 import { AnalysisResult, EmailBlock, BrandId } from './types'
 import { v4 as uuidv4 } from 'uuid'
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+// ─── Prompt ───────────────────────────────────────────────────────────────────
 
 const ANALYSIS_PROMPT = `Você é um especialista em e-mail marketing e design de e-mails HTML.
-Analise esta imagem de um layout de e-mail marketing e identifique todos os blocos de conteúdo.
+Analise este layout de e-mail marketing e identifique TODOS os blocos de conteúdo.
 
-Retorne um JSON com a seguinte estrutura exata:
+IMPORTANTE: Extraia todos os textos reais visíveis. Não invente conteúdo.
+
+Retorne SOMENTE um JSON válido com esta estrutura:
 {
   "blocks": [
     {
-      "type": "header|hero|text|cta|banner|bannerText|cards|columns2|columns3|divider|spacer|footer",
+      "type": "hero|text|cta|banner|bannerText|footer",
       "order": 0,
-      "content": {
-        // campos específicos para cada tipo de bloco
-      }
+      "content": {}
     }
   ],
-  "detectedColors": ["#hex1", "#hex2"],
-  "detectedFonts": ["FontName1"],
-  "rawDescription": "descrição geral do layout"
+  "detectedColors": ["#hex"],
+  "rawDescription": "descrição do layout"
 }
 
-Tipos de blocos e campos:
-- header: { logoUrl: string, logoWidth: string }
-- hero: { imageUrl: string, link: string, alt: string }
-- text: { headline: string, body: string, headlineSize: string }
-- cta: { buttonText: string, buttonUrl: string, text: string, buttonBg: string }
-- banner: { imageUrl: string, link: string, alt: string }
-- bannerText: { imageUrl: string, headline: string, body: string, buttonText: string, buttonUrl: string }
-- cards: { title: string, card1Text: string, card2Text: string, card3Text: string }
-- columns2: { col1Text: string, col2Text: string }
-- divider: { color: string }
-- spacer: { height: string }
+Campos por tipo:
+- hero: { "imageUrl": "", "link": "#", "alt": "" }
+- text: { "headline": "texto exato", "body": "texto exato" }
+- cta: { "buttonText": "texto exato do botão", "buttonUrl": "#", "text": "" }
+- banner: { "imageUrl": "", "link": "#", "alt": "" }
+- bannerText: { "imageUrl": "", "headline": "título", "body": "texto", "buttonText": "botão", "buttonUrl": "#" }
 - footer: {}
 
-Extraia todos os textos reais visíveis na imagem.
-Identifique as cores predominantes em formato hexadecimal.
-Retorne APENAS o JSON, sem markdown ou explicações.`
+Retorne APENAS o JSON, sem markdown.`
 
-export async function analyzeImageWithAI(
+// ─── Parser compartilhado ─────────────────────────────────────────────────────
+
+function parseAIResponse(raw: string): AnalysisResult {
+  const cleaned = raw
+    .trim()
+    .replace(/^```json\n?/, '')
+    .replace(/^```\n?/, '')
+    .replace(/\n?```$/, '')
+    .trim()
+
+  const parsed = JSON.parse(cleaned) as {
+    blocks: Array<{ type: string; order: number; content: Record<string, string> }>
+    detectedColors?: string[]
+    rawDescription?: string
+  }
+
+  const blocks: EmailBlock[] = parsed.blocks.map((b, i) => ({
+    id: uuidv4(),
+    type: b.type as EmailBlock['type'],
+    order: b.order ?? i,
+    content: b.content ?? {},
+  }))
+
+  return {
+    blocks,
+    detectedColors: parsed.detectedColors ?? [],
+    detectedFonts: [],
+    assets: [],
+    rawDescription: parsed.rawDescription ?? '',
+  }
+}
+
+// ─── Claude Vision ────────────────────────────────────────────────────────────
+
+export async function analyzeImageWithClaude(
   imageBase64: string,
   mimeType: string,
-  brandId: BrandId
+  brandId: BrandId,
 ): Promise<AnalysisResult> {
-  const message = await client.messages.create({
+  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+
+  const msg = await client.messages.create({
     model: 'claude-opus-4-8',
     max_tokens: 4096,
     messages: [
@@ -60,90 +89,92 @@ export async function analyzeImageWithAI(
               data: imageBase64,
             },
           },
-          {
-            type: 'text',
-            text: ANALYSIS_PROMPT + `\n\nA marca é: ${brandId}`,
-          },
+          { type: 'text', text: ANALYSIS_PROMPT + `\n\nMarca: ${brandId}` },
         ],
       },
     ],
   })
 
-  const content = message.content[0]
-  if (content.type !== 'text') throw new Error('Resposta inesperada da IA')
-
-  let raw = content.text.trim()
-  // Remove markdown code blocks if present
-  raw = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
-
-  const parsed = JSON.parse(raw) as {
-    blocks: Array<{ type: string; order: number; content: Record<string, string> }>
-    detectedColors: string[]
-    detectedFonts: string[]
-    rawDescription: string
-  }
-
-  const blocks: EmailBlock[] = parsed.blocks.map(b => ({
-    id: uuidv4(),
-    type: b.type as EmailBlock['type'],
-    order: b.order,
-    content: b.content,
-  }))
-
-  return {
-    blocks,
-    detectedColors: parsed.detectedColors || [],
-    detectedFonts: parsed.detectedFonts || [],
-    assets: [],
-    rawDescription: parsed.rawDescription || '',
-  }
+  const content = msg.content[0]
+  if (content.type !== 'text') throw new Error('Resposta inesperada do Claude')
+  return parseAIResponse(content.text)
 }
 
-export async function analyzeHTMLWithAI(htmlContent: string, brandId: BrandId): Promise<AnalysisResult> {
-  const message = await client.messages.create({
-    model: 'claude-opus-4-8',
+// ─── OpenAI Vision ────────────────────────────────────────────────────────────
+
+export async function analyzeImageWithOpenAI(
+  imageBase64: string,
+  mimeType: string,
+  brandId: BrandId,
+): Promise<AnalysisResult> {
+  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+
+  const response = await client.chat.completions.create({
+    model: 'gpt-4o',
     max_tokens: 4096,
     messages: [
       {
         role: 'user',
-        content: `Analise este HTML de e-mail marketing e identifique a estrutura de blocos.
-A marca é: ${brandId}
-
-HTML:
-\`\`\`html
-${htmlContent.slice(0, 8000)}
-\`\`\`
-
-${ANALYSIS_PROMPT}`,
+        content: [
+          {
+            type: 'image_url',
+            image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: 'high' },
+          },
+          { type: 'text', text: ANALYSIS_PROMPT + `\n\nMarca: ${brandId}` },
+        ],
       },
     ],
   })
 
-  const content = message.content[0]
-  if (content.type !== 'text') throw new Error('Resposta inesperada da IA')
+  const text = response.choices[0]?.message?.content
+  if (!text) throw new Error('Resposta vazia do OpenAI')
+  return parseAIResponse(text)
+}
 
-  let raw = content.text.trim()
-  raw = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
+// ─── Auto-seleção: tenta Claude, depois OpenAI ────────────────────────────────
 
-  const parsed = JSON.parse(raw) as {
-    blocks: Array<{ type: string; order: number; content: Record<string, string> }>
-    detectedColors: string[]
-    detectedFonts: string[]
-    rawDescription: string
+export async function analyzeImageWithAI(
+  imageBase64: string,
+  mimeType: string,
+  brandId: BrandId,
+): Promise<AnalysisResult> {
+  if (process.env.ANTHROPIC_API_KEY) {
+    return analyzeImageWithClaude(imageBase64, mimeType, brandId)
+  }
+  if (process.env.OPENAI_API_KEY) {
+    return analyzeImageWithOpenAI(imageBase64, mimeType, brandId)
+  }
+  throw new Error('Nenhuma chave de API configurada (ANTHROPIC_API_KEY ou OPENAI_API_KEY)')
+}
+
+// ─── Análise de HTML ──────────────────────────────────────────────────────────
+
+export async function analyzeHTMLWithAI(htmlContent: string, brandId: BrandId): Promise<AnalysisResult> {
+  const prompt = `Analise este HTML de e-mail marketing e identifique a estrutura de blocos.\nMarca: ${brandId}\n\nHTML:\n\`\`\`html\n${htmlContent.slice(0, 8000)}\n\`\`\`\n\n${ANALYSIS_PROMPT}`
+
+  if (process.env.ANTHROPIC_API_KEY) {
+    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+    const msg = await client.messages.create({
+      model: 'claude-opus-4-8',
+      max_tokens: 4096,
+      messages: [{ role: 'user', content: prompt }],
+    })
+    const c = msg.content[0]
+    if (c.type !== 'text') throw new Error('Resposta inesperada')
+    return parseAIResponse(c.text)
   }
 
-  const blocks: EmailBlock[] = parsed.blocks.map(b => ({
-    id: uuidv4(),
-    type: b.type as EmailBlock['type'],
-    order: b.order,
-    content: b.content,
-  }))
-
-  return {
-    blocks,
-    detectedColors: parsed.detectedColors || [],
-    detectedFonts: parsed.detectedFonts || [],
-    assets: [],
-    rawDescription: parsed.rawDescription || '',
+  if (process.env.OPENAI_API_KEY) {
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+    const res = await client.chat.completions.create({
+      model: 'gpt-4o',
+      max_tokens: 4096,
+      messages: [{ role: 'user', content: prompt }],
+    })
+    const text = res.choices[0]?.message?.content
+    if (!text) throw new Error('Resposta vazia')
+    return parseAIResponse(text)
   }
+
+  throw new Error('Nenhuma chave de API configurada')
 }
