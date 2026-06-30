@@ -2,6 +2,32 @@ import fs from 'fs'
 import path from 'path'
 import { BrandConfig, EmailBlock, Asset } from './types'
 
+// ─── Unsubscribe block (obrigatório em todos os e-mails) ──────────────────────
+
+const UNSUBSCRIBE_BLOCK = `
+<!-- Unsubscribe -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;margin:0 auto;">
+  <tr>
+    <td align="center" style="padding:24px 20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#8A8A8A;">
+      <p style="margin:0 0 10px;">Esse email foi enviado para %%emailaddr%%.</p>
+      <p style="margin:0 0 10px;">Caso não queira mais receber nossos emails acesse <a href="%%unsub_center_url%%" style="color:#8A8A8A;text-decoration:underline;">esse link</a>.</p>
+    </td>
+  </tr>
+</table>`
+
+function injectUnsubscribe(html: string): string {
+  // Remove bloco já existente no template para não duplicar
+  const cleaned = html.replace(
+    /<!--\s*Unsubscribe\s*-->[\s\S]*?<\/table>/i,
+    ''
+  )
+  // Injeta antes do </body>
+  if (cleaned.includes('</body>')) {
+    return cleaned.replace('</body>', `${UNSUBSCRIBE_BLOCK}\n</body>`)
+  }
+  return cleaned + UNSUBSCRIBE_BLOCK
+}
+
 // ─── Template loader ───────────────────────────────────────────────────────────
 
 function loadBaseTemplate(brandId: string): string | null {
@@ -146,7 +172,7 @@ export function generateFromTemplate(
     // Limpa placeholders não preenchidos
     .replace(/\{\{[a-zA-Z0-9_]+\}\}/g, '')
 
-  return filled
+  return injectUnsubscribe(filled)
 }
 
 // ─── Fallback block-by-block generator ────────────────────────────────────────
@@ -297,7 +323,7 @@ export function generateHTML(brand: BrandConfig, blocks: EmailBlock[], _assets: 
   const sortedBlocks = [...blocks].sort((a, b) => a.order - b.order)
   const bodyBg = brand.colors.background
 
-  return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  const html = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="pt-BR">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -340,19 +366,13 @@ export function generateHTML(brand: BrandConfig, blocks: EmailBlock[], _assets: 
             </td>
           </tr>
         </table>
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;margin:0 auto;">
-          <tr>
-            <td align="center" style="padding:16px 20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#8A8A8A;">
-              Esse email foi enviado para %%emailaddr%%.
-              Caso não queira mais receber nossos emails acesse <a href="%%unsub_center_url%%" style="color:#8A8A8A;text-decoration:underline;">esse link</a>.
-            </td>
-          </tr>
-        </table>
       </td>
     </tr>
   </table>
 </body>
 </html>`
+
+  return injectUnsubscribe(html)
 }
 
 // ─── Default blocks per brand ──────────────────────────────────────────────────
