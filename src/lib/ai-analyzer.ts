@@ -6,15 +6,32 @@ import { v4 as uuidv4 } from 'uuid'
 // ─── Prompt ───────────────────────────────────────────────────────────────────
 
 const ANALYSIS_PROMPT = `Você é um especialista em e-mail marketing e design de e-mails HTML.
-Analise este layout de e-mail marketing e identifique TODOS os blocos de conteúdo.
+Analise este layout de e-mail marketing e identifique TODOS os blocos de conteúdo, do topo até o final da imagem, na ordem em que aparecem.
 
-IMPORTANTE: Extraia todos os textos reais visíveis. Não invente conteúdo.
+REGRAS CRÍTICAS DE EXTRAÇÃO DE TEXTO:
+1. Transcreva o texto PALAVRA POR PALAVRA, exatamente como aparece na imagem. Não resuma, não parafraseie, não abrevie.
+2. Se um bloco de texto tiver várias frases ou parágrafos, inclua TODOS eles completos no campo "body", separados por "\\n\\n" se forem parágrafos distintos.
+3. Nunca corte um texto no meio de uma frase. Se não conseguir ler com certeza alguma palavra, mantenha o restante do texto e marque a palavra ilegível como "[ilegível]" — não pule o trecho inteiro.
+4. Não invente conteúdo que não esteja visível na imagem.
+5. Inclua TODOS os blocos visíveis na imagem, incluindo textos legais/disclaimers pequenos no final, mesmo que estejam em fonte pequena ou longos — transcreva o texto legal INTEIRO, sem resumir.
+6. Se a imagem tiver múltiplas seções de texto (ex: introdução, texto de seção, texto de corpo, texto legal), crie um bloco "text" separado para cada uma — não junte tudo em um único bloco.
+7. IMPORTANTE — texto sobreposto a imagens: se um título/texto estiver desenhado SOBRE uma foto/imagem de fundo (ex: texto sobre uma foto de carro), esse texto faz parte da imagem (hero/banner) e NÃO deve virar um bloco "text" ou "bannerText" separado — apenas descreva no campo "alt" da imagem. Só crie blocos "text" para textos que estão sobre fundo sólido/liso (fora de fotos).
+8. Se houver uma seção com TÍTULO + LISTA de itens (com marcadores • ou números 1,2,3...), SEMPRE use o tipo "list" — nunca classifique como "banner" vazio e nunca descarte os itens da lista.
+
+Tipos de bloco disponíveis e quando usar cada um:
+- hero: imagem principal/banner do topo (pode ter texto sobreposto na própria imagem)
+- text: parágrafo de texto sobre fundo sólido (introdução, texto de corpo, título de seção)
+- cta: botão de ação com texto e link
+- banner: imagem decorativa/promocional sem texto editável separado
+- bannerText: imagem + bloco de texto lado a lado (e não dentro da imagem)
+- list: título + lista de itens (com marcador • ou numeração 1,2,3), opcionalmente com imagem ao lado
+- footer: rodapé com texto legal/disclaimers
 
 Retorne SOMENTE um JSON válido com esta estrutura:
 {
   "blocks": [
     {
-      "type": "hero|text|cta|banner|bannerText|footer",
+      "type": "hero|text|cta|banner|bannerText|list|footer",
       "order": 0,
       "content": {}
     }
@@ -24,14 +41,15 @@ Retorne SOMENTE um JSON válido com esta estrutura:
 }
 
 Campos por tipo:
-- hero: { "imageUrl": "", "link": "#", "alt": "" }
-- text: { "headline": "texto exato", "body": "texto exato" }
+- hero: { "imageUrl": "", "link": "#", "alt": "descreva inclusive qualquer texto sobreposto na imagem" }
+- text: { "headline": "texto exato e completo", "body": "texto exato e completo, sem cortes" }
 - cta: { "buttonText": "texto exato do botão", "buttonUrl": "#", "text": "" }
 - banner: { "imageUrl": "", "link": "#", "alt": "" }
-- bannerText: { "imageUrl": "", "headline": "título", "body": "texto", "buttonText": "botão", "buttonUrl": "#" }
-- footer: {}
+- bannerText: { "imageUrl": "", "headline": "título", "body": "texto completo", "buttonText": "botão", "buttonUrl": "#" }
+- list: { "title": "título da seção", "items": "item 1\\nitem 2\\nitem 3" (um item por linha, separados por \\n), "ordered": "true ou false", "imageUrl": "" }
+- footer: { "legalText": "texto legal completo e exato, palavra por palavra, sem resumir nem cortar" }
 
-Retorne APENAS o JSON, sem markdown.`
+Retorne APENAS o JSON, sem markdown, sem comentários, sem truncar a resposta.`
 
 // ─── Parser compartilhado ─────────────────────────────────────────────────────
 
@@ -75,8 +93,8 @@ export async function analyzeImageWithClaude(
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
   const msg = await client.messages.create({
-    model: 'claude-opus-4-8',
-    max_tokens: 4096,
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 8192,
     messages: [
       {
         role: 'user',
@@ -111,7 +129,7 @@ export async function analyzeImageWithOpenAI(
 
   const response = await client.chat.completions.create({
     model: 'gpt-4o',
-    max_tokens: 4096,
+    max_tokens: 8192,
     messages: [
       {
         role: 'user',
@@ -155,8 +173,8 @@ export async function analyzeHTMLWithAI(htmlContent: string, brandId: BrandId): 
   if (process.env.ANTHROPIC_API_KEY) {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
     const msg = await client.messages.create({
-      model: 'claude-opus-4-8',
-      max_tokens: 4096,
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 8192,
       messages: [{ role: 'user', content: prompt }],
     })
     const c = msg.content[0]
@@ -168,7 +186,7 @@ export async function analyzeHTMLWithAI(htmlContent: string, brandId: BrandId): 
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
     const res = await client.chat.completions.create({
       model: 'gpt-4o',
-      max_tokens: 4096,
+      max_tokens: 8192,
       messages: [{ role: 'user', content: prompt }],
     })
     const text = res.choices[0]?.message?.content

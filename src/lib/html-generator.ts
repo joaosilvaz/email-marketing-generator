@@ -52,6 +52,68 @@ function content(block: EmailBlock | undefined): Record<string, string> {
   return (block?.content ?? {}) as Record<string, string>
 }
 
+// ─── List block (título + itens com marcador/numeração) ───────────────────────
+
+function renderListBlock(block: EmailBlock, brand: BrandConfig): string {
+  const c = content(block)
+  const items = (c.items || '').split('\n').map(i => i.trim()).filter(Boolean)
+  const ordered = c.ordered === 'true'
+  const { colors, fonts } = brand
+
+  const itemsHtml = items
+    .map((item, i) => `
+      <tr>
+        <td style="padding:0 0 8px;vertical-align:top;width:20px;">
+          <span style="font-family:${fonts.body.fallback};font-size:14px;color:${colors.primary};font-weight:700;">${ordered ? `${i + 1}.` : '•'}</span>
+        </td>
+        <td style="padding:0 0 8px;vertical-align:top;">
+          <span style="font-family:${fonts.body.fallback};font-size:14px;color:${colors.text};line-height:1.5;">${item}</span>
+        </td>
+      </tr>`)
+    .join('')
+
+  const listContent = `
+    ${c.title ? `<p style="margin:0 0 14px;font-family:${fonts.heading.fallback};font-size:20px;color:${colors.primary};font-weight:700;text-transform:uppercase;">${c.title}</p>` : ''}
+    <table cellpadding="0" cellspacing="0" border="0">${itemsHtml}</table>`
+
+  if (c.imageUrl) {
+    return `
+    <tr>
+      <td style="padding:24px 0;background-color:${colors.background};">
+        <table width="600" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td width="280" valign="top" style="padding:0 24px 0 0;">${listContent}</td>
+            <td width="320" valign="top" style="padding:0;font-size:0;line-height:0;">
+              <img src="${c.imageUrl}" width="320" alt="${c.title || ''}" style="display:block;width:100%;border:0;"/>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>`
+  }
+
+  return `
+    <tr>
+      <td style="padding:24px 32px;background-color:${colors.background};">
+        ${listContent}
+      </td>
+    </tr>`
+}
+
+// ─── Blocos extras (tipos sem placeholder fixo no template da marca) ──────────
+
+const TEMPLATE_MAPPED_TYPES = new Set(['hero', 'cta', 'text', 'banner', 'bannerText', 'footer'])
+
+function renderExtraBlocks(blocks: EmailBlock[], brand: BrandConfig): string {
+  const extras = blocks
+    .filter(b => !TEMPLATE_MAPPED_TYPES.has(b.type))
+    .sort((a, b) => a.order - b.order)
+
+  return extras
+    .map(b => b.type === 'list' ? renderListBlock(b, brand) : renderBlock(b, brand))
+    .join('\n')
+}
+
 // ─── Template-based generator (uses real brand HTML files) ────────────────────
 
 export function generateFromTemplate(
@@ -164,8 +226,11 @@ export function generateFromTemplate(
     .replace(/\{\{sideBannerTitle\}\}/g, content(sideBlock ?? texts[1]).headline || '')
     .replace(/\{\{sideBannerText\}\}/g,  content(sideBlock ?? texts[1]).body     || '')
 
+    // ── Blocos extras (list, cards, etc — sem placeholder fixo) ────────────────
+    .replace(/\{\{extraBlocks\}\}/g, renderExtraBlocks(sorted, brand))
+
     // ── Legal / footer ────────────────────────────────────────────────────────
-    .replace(/\{\{legalText\}\}/g, legalText || brand.legalText || 'Desacelere. Seu bem maior é a vida.')
+    .replace(/\{\{legalText\}\}/g, legalText || content(blocksByType(sorted, 'footer')[0]).legalText || brand.legalText || 'Desacelere. Seu bem maior é a vida.')
     .replace(/\{\{year\}\}/g, String(new Date().getFullYear()))
     .replace(/\{\{unsubscribeUrl\}\}/g, '%%unsub_center_url%%')
 
@@ -305,6 +370,9 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
 
     case 'spacer':
       return `<tr><td style="height:${c.height || '32px'};font-size:0;line-height:0;">&nbsp;</td></tr>`
+
+    case 'list':
+      return renderListBlock(block, brand)
 
     case 'footer':
       return `

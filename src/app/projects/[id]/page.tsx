@@ -88,7 +88,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
   return (
     <div className="flex flex-col h-screen">
       {/* Top bar */}
-      <div className="flex items-center gap-4 px-5 py-3 border-b border-zinc-800 bg-zinc-950 flex-shrink-0">
+      <div className="flex items-center gap-4 px-5 py-3 border-b border-zinc-800 bg-zinc-950 shrink-0">
         <Link href="/projects" className="text-zinc-500 hover:text-white transition-colors">
           <ArrowLeft size={18} />
         </Link>
@@ -161,7 +161,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
         {tab === 'blocks' && (
           <div className="flex-1 flex overflow-hidden">
             {/* Block editor panel */}
-            <div className="w-80 border-r border-zinc-800 overflow-y-auto p-4 flex-shrink-0">
+            <div className="w-80 border-r border-zinc-800 overflow-y-auto p-4 shrink-0">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-white text-sm font-semibold">Blocos do E-mail</h2>
                 <button
