@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { analyzeImageWithAI, analyzeHTMLWithAI } from '@/lib/ai-analyzer'
+import { analyzeImageWithAI, analyzeHTMLWithAI, analyzeFigmaDigestWithAI } from '@/lib/ai-analyzer'
+import { extractFigmaFrame, buildFigmaDigest } from '@/lib/figma-client'
 import { getProject, saveProject } from '@/lib/storage'
 import { generateDefaultBlocks } from '@/lib/html-generator'
 import { getBrand } from '@/lib/brands'
@@ -8,6 +9,8 @@ import fs from 'fs'
 import path from 'path'
 
 export const runtime = 'nodejs'
+
+const HAS_AI_KEY = !!(process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY)
 
 export async function POST(req: Request) {
   const body = await req.json() as {
@@ -21,20 +24,12 @@ export async function POST(req: Request) {
   const project = getProject(body.projectId)
   if (!project) return NextResponse.json({ error: 'Project not found' }, { status: 404 })
 
-  // Update status to analyzing
   saveProject({ ...project, status: 'analyzing', updatedAt: new Date().toISOString() })
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    // No API key — use default blocks
+  if (!HAS_AI_KEY) {
     const brand = getBrand(project.brandId as BrandId)
     const blocks = generateDefaultBlocks(brand)
-    const updated = {
-      ...project,
-      blocks,
-      status: 'ready' as const,
-      updatedAt: new Date().toISOString(),
-    }
-    saveProject(updated)
+    saveProject({ ...project, blocks, status: 'ready' as const, updatedAt: new Date().toISOString() })
     return NextResponse.json({
       blocks,
       detectedColors: [brand.colors.primary],
@@ -57,15 +52,21 @@ export async function POST(req: Request) {
       result = await analyzeImageWithAI(base64, mimeType, project.brandId as BrandId)
     } else if (body.type === 'html' && body.htmlContent) {
       result = await analyzeHTMLWithAI(body.htmlContent, project.brandId as BrandId)
+    } else if (body.type === 'figma' && body.figmaUrl) {
+      if (!process.env.FIGMA_ACCESS_TOKEN) {
+        throw new Error('FIGMA_ACCESS_TOKEN não configurado. Adicione no .env.local ou use upload de imagem/HTML.')
+      }
+      const extraction = await extractFigmaFrame(body.figmaUrl)
+      const digest = buildFigmaDigest(extraction)
+      result = await analyzeFigmaDigestWithAI(digest, extraction.imageUrls, project.brandId as BrandId)
     } else {
-      // Figma URL or fallback
       const brand = getBrand(project.brandId as BrandId)
       result = {
         blocks: generateDefaultBlocks(brand),
         detectedColors: [brand.colors.primary],
         detectedFonts: [],
         assets: [],
-        rawDescription: 'Template padrão (integração Figma não configurada)',
+        rawDescription: 'Nenhuma fonte de conteúdo válida foi enviada',
       }
     }
 

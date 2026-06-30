@@ -17,6 +17,9 @@ REGRAS CRÍTICAS DE EXTRAÇÃO DE TEXTO:
 6. Se a imagem tiver múltiplas seções de texto (ex: introdução, texto de seção, texto de corpo, texto legal), crie um bloco "text" separado para cada uma — não junte tudo em um único bloco.
 7. IMPORTANTE — texto sobreposto a imagens: se um título/texto estiver desenhado SOBRE uma foto/imagem de fundo (ex: texto sobre uma foto de carro), esse texto faz parte da imagem (hero/banner) e NÃO deve virar um bloco "text" ou "bannerText" separado — apenas descreva no campo "alt" da imagem. Só crie blocos "text" para textos que estão sobre fundo sólido/liso (fora de fotos).
 8. Se houver uma seção com TÍTULO + LISTA de itens (com marcadores • ou números 1,2,3...), SEMPRE use o tipo "list" — nunca classifique como "banner" vazio e nunca descarte os itens da lista.
+9. Se houver 3 ou mais itens lado a lado com imagem + texto curto cada (formato "card"), use o tipo "cards". Se houver exatamente 2 colunas de conteúdo (imagem+texto cada), use "columns2". Se houver exatamente 3 colunas, use "columns3".
+10. Preserve a ORDEM EXATA em que os blocos aparecem na imagem, de cima para baixo. O campo "order" deve refletir essa ordem (0, 1, 2, 3...).
+11. Não pule nenhuma seção visível, mesmo que pareça repetida ou pouco importante (ex: múltiplos banners de produtos similares devem virar múltiplos blocos "banner" separados, um para cada).
 
 Tipos de bloco disponíveis e quando usar cada um:
 - hero: imagem principal/banner do topo (pode ter texto sobreposto na própria imagem)
@@ -25,13 +28,16 @@ Tipos de bloco disponíveis e quando usar cada um:
 - banner: imagem decorativa/promocional sem texto editável separado
 - bannerText: imagem + bloco de texto lado a lado (e não dentro da imagem)
 - list: título + lista de itens (com marcador • ou numeração 1,2,3), opcionalmente com imagem ao lado
+- cards: 3+ itens lado a lado, cada um com imagem pequena + texto curto
+- columns2: exatamente 2 colunas de conteúdo (imagem+texto)
+- columns3: exatamente 3 colunas de conteúdo (imagem+texto)
 - footer: rodapé com texto legal/disclaimers
 
 Retorne SOMENTE um JSON válido com esta estrutura:
 {
   "blocks": [
     {
-      "type": "hero|text|cta|banner|bannerText|list|footer",
+      "type": "hero|text|cta|banner|bannerText|list|cards|columns2|columns3|footer",
       "order": 0,
       "content": {}
     }
@@ -47,6 +53,9 @@ Campos por tipo:
 - banner: { "imageUrl": "", "link": "#", "alt": "" }
 - bannerText: { "imageUrl": "", "headline": "título", "body": "texto completo", "buttonText": "botão", "buttonUrl": "#" }
 - list: { "title": "título da seção", "items": "item 1\\nitem 2\\nitem 3" (um item por linha, separados por \\n), "ordered": "true ou false", "imageUrl": "" }
+- cards: { "title": "título da seção (opcional)", "card1Image": "", "card1Text": "texto exato", "card2Image": "", "card2Text": "texto exato", "card3Image": "", "card3Text": "texto exato" }
+- columns2: { "col1Image": "", "col1Text": "texto exato", "col2Image": "", "col2Text": "texto exato" }
+- columns3: { "col1Image": "", "col1Text": "", "col2Image": "", "col2Text": "", "col3Image": "", "col3Text": "" }
 - footer: { "legalText": "texto legal completo e exato, palavra por palavra, sem resumir nem cortar" }
 
 Retorne APENAS o JSON, sem markdown, sem comentários, sem truncar a resposta.`
@@ -195,4 +204,70 @@ export async function analyzeHTMLWithAI(htmlContent: string, brandId: BrandId): 
   }
 
   throw new Error('Nenhuma chave de API configurada')
+}
+
+// ─── Análise via Figma (texto exato extraído via API, sem OCR) ────────────────
+//
+// O texto vem diretamente dos nós do Figma (100% fiel, sem risco de erro de
+// leitura). A IA só precisa classificar esse conteúdo já correto nos tipos de
+// bloco — não precisa "ler" nada, só organizar. Imagens chegam como tokens
+// {{IMG:nodeId}} que são substituídos pela URL real exportada após a resposta.
+
+export async function analyzeFigmaDigestWithAI(
+  digest: string,
+  imageUrls: Record<string, string>,
+  brandId: BrandId,
+): Promise<AnalysisResult> {
+  const prompt = `Os itens abaixo foram extraídos DIRETAMENTE da árvore de nós de um arquivo do Figma (texto 100% exato, sem erro de leitura), na ordem vertical em que aparecem no design (de cima para baixo).
+
+Marca: ${brandId}
+
+Itens extraídos:
+${digest}
+
+Sua tarefa é ORGANIZAR esses itens nos blocos de e-mail marketing corretos. Para os itens do tipo [IMAGEM id=XXX], use exatamente "{{IMG:XXX}}" como valor de imageUrl (vamos substituir pela URL real depois) — não invente outra URL.
+
+${ANALYSIS_PROMPT}`
+
+  let raw: string
+
+  if (process.env.ANTHROPIC_API_KEY) {
+    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+    const msg = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 8192,
+      messages: [{ role: 'user', content: prompt }],
+    })
+    const c = msg.content[0]
+    if (c.type !== 'text') throw new Error('Resposta inesperada')
+    raw = c.text
+  } else if (process.env.OPENAI_API_KEY) {
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+    const res = await client.chat.completions.create({
+      model: 'gpt-4o',
+      max_tokens: 8192,
+      messages: [{ role: 'user', content: prompt }],
+    })
+    const text = res.choices[0]?.message?.content
+    if (!text) throw new Error('Resposta vazia')
+    raw = text
+  } else {
+    throw new Error('Nenhuma chave de API configurada (ANTHROPIC_API_KEY ou OPENAI_API_KEY)')
+  }
+
+  const result = parseAIResponse(raw)
+
+  // Substitui {{IMG:nodeId}} pelas URLs reais exportadas do Figma
+  for (const block of result.blocks) {
+    for (const [key, value] of Object.entries(block.content)) {
+      if (typeof value !== 'string') continue
+      const match = value.match(/^\{\{IMG:(.+)\}\}$/)
+      if (match) {
+        const nodeId = match[1]
+        block.content[key] = imageUrls[nodeId] || 'https://via.placeholder.com/600x300'
+      }
+    }
+  }
+
+  return result
 }

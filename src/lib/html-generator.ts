@@ -374,6 +374,73 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
     case 'list':
       return renderListBlock(block, brand)
 
+    case 'cards': {
+      const cardItems = [
+        { img: c.card1Image, text: c.card1Text },
+        { img: c.card2Image, text: c.card2Text },
+        { img: c.card3Image, text: c.card3Text },
+      ].filter(card => card.img || card.text)
+
+      const cardsHtml = cardItems
+        .map(card => `
+          <td width="${Math.floor(100 / cardItems.length)}%" valign="top" style="padding:0 8px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${colors.background};border-radius:4px;overflow:hidden;">
+              ${card.img ? `<tr><td><img src="${card.img}" width="170" style="display:block;width:100%;border:0;"/></td></tr>` : ''}
+              ${card.text ? `<tr><td style="padding:12px;font-family:${fonts.body.fallback};font-size:13px;color:${colors.text};">${card.text}</td></tr>` : ''}
+            </table>
+          </td>`)
+        .join('')
+
+      return `
+      <tr>
+        <td style="padding:24px 20px;background-color:${colors.background};">
+          ${c.title ? `<p style="text-align:center;font-family:${fonts.heading.fallback};font-size:20px;color:${colors.primary};margin:0 0 20px;font-weight:700;">${c.title}</p>` : ''}
+          <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>${cardsHtml}</tr></table>
+        </td>
+      </tr>`
+    }
+
+    case 'columns2': {
+      const cols2 = [
+        { img: c.col1Image, text: c.col1Text },
+        { img: c.col2Image, text: c.col2Text },
+      ]
+      const cols2Html = cols2
+        .map(col => `
+          <td width="300" valign="top" style="padding:0;font-size:0;line-height:0;">
+            ${col.img ? `<img src="${col.img}" width="300" style="display:block;border:0;width:100%;"/>` : ''}
+            ${col.text ? `<div style="padding:16px;font-size:14px;font-family:${fonts.body.fallback};color:${colors.text};line-height:1.5;">${col.text}</div>` : ''}
+          </td>`)
+        .join('')
+      return `
+      <tr>
+        <td style="padding:0;background-color:${colors.background};">
+          <table width="600" cellpadding="0" cellspacing="0" border="0"><tr>${cols2Html}</tr></table>
+        </td>
+      </tr>`
+    }
+
+    case 'columns3': {
+      const cols3 = [
+        { img: c.col1Image, text: c.col1Text },
+        { img: c.col2Image, text: c.col2Text },
+        { img: c.col3Image, text: c.col3Text },
+      ]
+      const cols3Html = cols3
+        .map(col => `
+          <td width="200" valign="top" style="padding:0;font-size:0;line-height:0;">
+            ${col.img ? `<img src="${col.img}" width="200" style="display:block;border:0;width:100%;"/>` : ''}
+            ${col.text ? `<div style="padding:12px;font-size:13px;font-family:${fonts.body.fallback};color:${colors.text};line-height:1.5;">${col.text}</div>` : ''}
+          </td>`)
+        .join('')
+      return `
+      <tr>
+        <td style="padding:0;background-color:${colors.background};">
+          <table width="600" cellpadding="0" cellspacing="0" border="0"><tr>${cols3Html}</tr></table>
+        </td>
+      </tr>`
+    }
+
     case 'footer':
       return `
       <tr>
