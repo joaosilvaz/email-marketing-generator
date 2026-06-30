@@ -193,30 +193,35 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
       </tr>`
 
     case 'cta': {
-      const btnBg = c.buttonBg || colors.buttonBg
+      const btnBg    = c.buttonBg    || colors.buttonBg
       const btnColor = c.buttonColor || colors.buttonText
-      const btnText = c.buttonText || 'Saiba Mais'
-      const btnUrl = c.buttonUrl || '#'
-      const btnFs = buttonStyle.fontSize
-      const btnFw = buttonStyle.fontWeight
-      const btnTt = buttonStyle.textTransform
-      const btnRadius = buttonStyle.borderRadius
+      const btnText  = c.buttonText  || 'Saiba Mais'
+      const btnUrl   = c.buttonUrl   || '#'
+      const btnFs    = buttonStyle.fontSize
+      const btnFw    = buttonStyle.fontWeight
+      const btnTt    = buttonStyle.textTransform
+      const btnPad   = buttonStyle.padding    // ex: "0 24px"
+      const sectionBg = c.bg || colors.background
       return `
       <tr>
-        <td align="center" style="padding:${c.padding || '24px 40px'};background-color:${c.bg || colors.background};">
+        <td style="padding:${c.padding || '24px 40px'};background-color:${sectionBg};" align="center">
           ${c.text ? `<p style="margin:0 0 16px;font-family:${fonts.body.fallback};font-size:20px;color:${colors.textLight};text-align:center;">${c.text}</p>` : ''}
-          <!--[if mso]>
-          <v:rect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
-            href="${btnUrl}" style="height:49px;v-text-anchor:middle;width:280px;"
-            fillcolor="${btnBg}" stroke="f">
-            <w:anchorlock/>
-            <center style="color:${btnColor};font-family:Arial,sans-serif;font-size:${btnFs};font-weight:${btnFw};text-transform:${btnTt};white-space:nowrap;">${btnText}</center>
-          </v:rect>
-          <![endif]-->
-          <!--[if !mso]><!-->
-          <a href="${btnUrl}" target="_blank"
-            style="white-space:nowrap;background-color:${btnBg};border-radius:${btnRadius};display:inline-block;text-align:center;text-decoration:none;color:${btnColor};font-weight:${btnFw};font-family:${fonts.heading.fallback};font-size:${btnFs};text-transform:${btnTt};line-height:49px;padding:${buttonStyle.padding};mso-hide:all;-webkit-text-size-adjust:none;">${btnText}</a>
-          <!--<![endif]-->
+          <div>
+            <!--[if mso]>
+            <v:rect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+              href="${btnUrl}" style="height:49px; v-text-anchor:middle; width:328px;"
+              fillcolor="${btnBg}" strokecolor="${btnColor}" strokeweight="1pt">
+              <w:anchorlock/>
+              <center style="color:${btnColor}; font-family:Arial,sans-serif; font-size:${btnFs}; font-weight:${btnFw}; text-transform:${btnTt}; white-space:nowrap;">
+                ${btnText}
+              </center>
+            </v:rect>
+            <![endif]-->
+            <!--[if !mso]><!-->
+            <a href="${btnUrl}" target="_blank"
+              style="white-space:nowrap; background-color:${btnBg}; display:inline-block; text-align:center; text-decoration:none; color:${btnColor}; font-weight:${btnFw}; font-family:Arial,sans-serif; font-size:${btnFs}; text-transform:${btnTt}; line-height:49px; padding:${btnPad}; mso-hide:all; -webkit-text-size-adjust:none;">${btnText}</a>
+            <!--<![endif]-->
+          </div>
         </td>
       </tr>`
     }
@@ -246,14 +251,15 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
                 ${c.buttonText ? `
                   <!--[if mso]>
                   <v:rect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
-                    href="${c.buttonUrl || '#'}" style="height:43px;v-text-anchor:middle;width:160px;"
-                    fillcolor="${colors.buttonBg}" stroke="f">
+                    href="${c.buttonUrl || '#'}" style="height:43px; v-text-anchor:middle; width:160px;"
+                    fillcolor="${colors.buttonBg}" strokecolor="${colors.buttonText}" strokeweight="1pt">
                     <w:anchorlock/>
-                    <center style="color:${colors.buttonText};font-family:Arial,sans-serif;font-size:${buttonStyle.fontSize};font-weight:${buttonStyle.fontWeight};text-transform:${buttonStyle.textTransform};white-space:nowrap;">${c.buttonText}</center>
+                    <center style="color:${colors.buttonText}; font-family:Arial,sans-serif; font-size:${buttonStyle.fontSize}; font-weight:${buttonStyle.fontWeight}; text-transform:${buttonStyle.textTransform}; white-space:nowrap;">${c.buttonText}</center>
                   </v:rect>
                   <![endif]-->
                   <!--[if !mso]><!-->
-                  <a href="${c.buttonUrl || '#'}" target="_blank" style="white-space:nowrap;background-color:${colors.buttonBg};border-radius:${buttonStyle.borderRadius};display:inline-block;text-align:center;text-decoration:none;color:${colors.buttonText};font-weight:${buttonStyle.fontWeight};font-family:${fonts.heading.fallback};font-size:${buttonStyle.fontSize};text-transform:${buttonStyle.textTransform};line-height:43px;padding:0 24px;mso-hide:all;">${c.buttonText}</a>
+                  <a href="${c.buttonUrl || '#'}" target="_blank"
+                    style="white-space:nowrap; background-color:${colors.buttonBg}; display:inline-block; text-align:center; text-decoration:none; color:${colors.buttonText}; font-weight:${buttonStyle.fontWeight}; font-family:Arial,sans-serif; font-size:${buttonStyle.fontSize}; text-transform:${buttonStyle.textTransform}; line-height:43px; padding:0 24px; mso-hide:all; -webkit-text-size-adjust:none;">${c.buttonText}</a>
                   <!--<![endif]-->` : ''}
               </td>
             </tr>
