@@ -1,10 +1,163 @@
+import fs from 'fs'
+import path from 'path'
 import { BrandConfig, EmailBlock, Asset } from './types'
+
+// ─── Template loader ───────────────────────────────────────────────────────────
+
+function loadBaseTemplate(brandId: string): string | null {
+  try {
+    const p = path.join(process.cwd(), 'src', 'lib', 'templates', `${brandId}-base.html`)
+    if (!fs.existsSync(p)) return null
+    return fs.readFileSync(p, 'utf-8')
+  } catch {
+    return null
+  }
+}
+
+// ─── Block helpers ─────────────────────────────────────────────────────────────
+
+function blocksByType(blocks: EmailBlock[], type: EmailBlock['type']) {
+  return blocks
+    .filter(b => b.type === type)
+    .sort((a, b) => a.order - b.order)
+}
+
+function content(block: EmailBlock | undefined): Record<string, string> {
+  return (block?.content ?? {}) as Record<string, string>
+}
+
+// ─── Template-based generator (uses real brand HTML files) ────────────────────
+
+export function generateFromTemplate(
+  brand: BrandConfig,
+  blocks: EmailBlock[],
+  _assets: Asset[],
+  legalText?: string,
+): string {
+  const tpl = loadBaseTemplate(brand.id)
+  if (!tpl) return generateHTML(brand, blocks, _assets)
+
+  const sorted = [...blocks].sort((a, b) => a.order - b.order)
+
+  const heroes      = blocksByType(sorted, 'hero')
+  const ctas        = blocksByType(sorted, 'cta')
+  const texts       = blocksByType(sorted, 'text')
+  const banners     = blocksByType(sorted, 'banner')
+  const bannerTexts = blocksByType(sorted, 'bannerText')
+
+  const hero      = heroes[0]
+  const cta1      = ctas[0]
+  const cta2      = ctas[1]
+  const intro     = texts[0]
+  const section   = texts[1]
+  const body      = texts[2]
+  const banner1   = banners[0]
+  const banner2   = banners[1]
+  const banner3   = banners[2]
+  const sideBlock = bannerTexts[0]
+
+  const filled = tpl
+    // ── Hero ──────────────────────────────────────────────────────────────────
+    .replace(/\{\{heroImage\}\}/g, content(hero).imageUrl || 'https://via.placeholder.com/600x300')
+    .replace(/\{\{heroAlt\}\}/g,   content(hero).alt       || brand.displayName)
+    .replace(/\{\{headerImage\}\}/g, content(hero).imageUrl || 'https://via.placeholder.com/600x80')
+
+    // ── CTAs ──────────────────────────────────────────────────────────────────
+    .replace(/\{\{ctaUrl\}\}/g,    content(cta1).buttonUrl  || content(cta2).buttonUrl || '#')
+    .replace(/\{\{ctaText1\}\}/g,  content(cta1).buttonText || 'Saiba Mais')
+    .replace(/\{\{ctaText2\}\}/g,  content(cta2 ?? cta1).buttonText || 'Saiba Mais')
+
+    // CTA button images (RAM uses image CTAs — keep fallback URL)
+    .replace(/\{\{ctaButtonImage\}\}/g,        content(cta1).buttonImage        || 'https://via.placeholder.com/385x49')
+    .replace(/\{\{ctaButton2Image\}\}/g,        content(cta2 ?? cta1).buttonImage || 'https://via.placeholder.com/371x49')
+    .replace(/\{\{ctaProductButtonImage\}\}/g,  content(cta1).buttonImage        || 'https://via.placeholder.com/130x43')
+    .replace(/\{\{ctaProductButtonAlt\}\}/g,    content(cta1).buttonText         || 'Saiba Mais')
+
+    // ── Intro text ────────────────────────────────────────────────────────────
+    .replace(/\{\{introText\}\}/g,           content(intro).body       || '')
+    .replace(/\{\{personalizationName\}\}/g, content(intro).headline   || '%Nome%,')
+
+    // ── Section title / body ──────────────────────────────────────────────────
+    .replace(/\{\{sectionTitle\}\}/g, content(section).headline || content(section).body || '')
+    .replace(/\{\{bodyText\}\}/g,     content(body).body        || content(body).headline || '')
+
+    // ── Banners ───────────────────────────────────────────────────────────────
+    .replace(/\{\{banner1Image\}\}/g, content(banner1).imageUrl || 'https://via.placeholder.com/600x200')
+    .replace(/\{\{banner1Alt\}\}/g,   content(banner1).alt      || 'Banner')
+    .replace(/\{\{banner1Url\}\}/g,   content(banner1).link     || content(cta1).buttonUrl || '#')
+
+    .replace(/\{\{banner2Image\}\}/g, content(banner2).imageUrl || 'https://via.placeholder.com/600x200')
+    .replace(/\{\{banner2Alt\}\}/g,   content(banner2).alt      || 'Banner')
+    .replace(/\{\{banner2Url\}\}/g,   content(banner2).link     || content(cta1).buttonUrl || '#')
+
+    .replace(/\{\{banner3Image\}\}/g, content(banner3).imageUrl || 'https://via.placeholder.com/600x200')
+    .replace(/\{\{banner3Alt\}\}/g,   content(banner3).alt      || 'Banner')
+    .replace(/\{\{banner3Url\}\}/g,   content(banner3).link     || content(cta1).buttonUrl || '#')
+
+    // Peugeot usa 4 banners (versões do modelo)
+    .replace(/\{\{banner4Image\}\}/g, content(banners[3]).imageUrl || 'https://via.placeholder.com/600x200')
+    .replace(/\{\{banner4Alt\}\}/g,   content(banners[3]).alt      || 'Banner')
+    .replace(/\{\{banner4Url\}\}/g,   content(banners[3]).link     || content(cta1).buttonUrl || '#')
+
+    // ── Side banner (bannerText) ───────────────────────────────────────────────
+    .replace(/\{\{sideBannerImage\}\}/g,   content(sideBlock).imageUrl   || 'https://via.placeholder.com/300x330')
+    .replace(/\{\{sideBannerTitle\}\}/g,   content(sideBlock).headline   || '')
+    .replace(/\{\{sideBannerText\}\}/g,    content(sideBlock).body       || '')
+    .replace(/\{\{sideBannerCtaText\}\}/g, content(sideBlock).buttonText || 'Saiba Mais')
+    .replace(/\{\{sideBannerCtaUrl\}\}/g,  content(sideBlock).buttonUrl  || content(cta1).buttonUrl || '#')
+
+    // ── Jeep dark section ─────────────────────────────────────────────────────
+    .replace(/\{\{darkSectionTitle\}\}/g, content(section ?? body ?? intro).headline || '')
+    .replace(/\{\{darkSectionText\}\}/g,  content(section ?? body ?? intro).body     || '')
+    .replace(/\{\{darkSectionImage\}\}/g, content(banner2 ?? banner1).imageUrl       || 'https://via.placeholder.com/600x300')
+    .replace(/\{\{darkCtaImage\}\}/g,     content(cta2 ?? cta1).buttonImage          || 'https://via.placeholder.com/335x49')
+    .replace(/\{\{darkCtaText\}\}/g,      content(cta2 ?? cta1).buttonText           || 'Saiba Mais')
+    .replace(/\{\{jeepLogoWhite\}\}/g,    '/brands/jeep/logo-white.png')
+
+    // Jeep col (text+image side by side sections)
+    .replace(/\{\{col1Title\}\}/g,  content(texts[1]).headline  || '')
+    .replace(/\{\{col1Text\}\}/g,   content(texts[1]).body      || '')
+    .replace(/\{\{col1Image\}\}/g,  content(banner1).imageUrl   || 'https://via.placeholder.com/300x300')
+    .replace(/\{\{col1Alt\}\}/g,    content(banner1).alt        || '')
+    .replace(/\{\{col2Title\}\}/g,  content(texts[2]).headline  || '')
+    .replace(/\{\{col2Text\}\}/g,   content(texts[2]).body      || '')
+    .replace(/\{\{col2Image\}\}/g,  content(banner2).imageUrl   || 'https://via.placeholder.com/300x300')
+    .replace(/\{\{col2Alt\}\}/g,    content(banner2).alt        || '')
+
+    // ── RAM specific ──────────────────────────────────────────────────────────
+    .replace(/\{\{tagline\}\}/g,         content(intro).headline || brand.displayName.toUpperCase())
+    .replace(/\{\{vehicleImage\}\}/g,    content(banner1).imageUrl || 'https://via.placeholder.com/280x200')
+    .replace(/\{\{vehicleAlt\}\}/g,      content(banner1).alt      || brand.displayName)
+    .replace(/\{\{priceLabel\}\}/g,      content(texts[1]).headline || 'A PARTIR DE:')
+    .replace(/\{\{price\}\}/g,           content(texts[1]).body     || 'Consulte')
+    .replace(/\{\{priceSubtitle\}\}/g,   content(texts[2]).body     || '')
+    .replace(/\{\{priceDisclaimer\}\}/g, content(texts[3]).body     || '*CONSULTE CONDIÇÕES')
+    .replace(/\{\{dividerImage\}\}/g,    'https://via.placeholder.com/600x8')
+
+    // ── Leapmotor specific ────────────────────────────────────────────────────
+    .replace(/\{\{sideBannerTitle\}\}/g, content(sideBlock ?? texts[1]).headline || '')
+    .replace(/\{\{sideBannerText\}\}/g,  content(sideBlock ?? texts[1]).body     || '')
+
+    // ── Legal / footer ────────────────────────────────────────────────────────
+    .replace(/\{\{legalText\}\}/g, legalText || brand.legalText || 'Desacelere. Seu bem maior é a vida.')
+    .replace(/\{\{year\}\}/g, String(new Date().getFullYear()))
+    .replace(/\{\{unsubscribeUrl\}\}/g, '%%unsub_center_url%%')
+
+    // Limpa placeholders não preenchidos
+    .replace(/\{\{[a-zA-Z0-9_]+\}\}/g, '')
+
+  return filled
+}
+
+// ─── Fallback block-by-block generator ────────────────────────────────────────
+// Usado quando não existe template real para a marca
 
 function replacePlaceholders(html: string): string {
   const year = new Date().getFullYear()
   return html
     .replace(/\{\{year\}\}/g, String(year))
     .replace(/\{\{unsubscribeUrl\}\}/g, '#unsubscribe')
+    .replace(/\{\{legalText\}\}/g, '')
 }
 
 function renderBlock(block: EmailBlock, brand: BrandConfig): string {
@@ -14,7 +167,6 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
   switch (block.type) {
     case 'header':
       return `
-      <!-- HEADER -->
       <tr>
         <td align="center" style="background-color:${colors.headerBg};padding:20px 40px;">
           <img src="${c.logoUrl || brand.logoUrl}" width="${c.logoWidth || brand.logoWidth}" alt="${brand.displayName}" style="display:block;border:0;"/>
@@ -23,22 +175,20 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
 
     case 'hero':
       return `
-      <!-- HERO -->
       <tr>
         <td style="padding:0;font-size:0;line-height:0;">
           <a href="${c.link || '#'}" style="display:block;">
-            <img src="${c.imageUrl || 'https://via.placeholder.com/600x300'}" width="600" alt="${c.alt || 'Hero Image'}" style="display:block;width:100%;max-width:600px;border:0;"/>
+            <img src="${c.imageUrl || 'https://via.placeholder.com/600x300'}" width="600" alt="${c.alt || ''}" style="display:block;width:100%;max-width:600px;border:0;"/>
           </a>
         </td>
       </tr>`
 
     case 'text':
       return `
-      <!-- TEXT -->
       <tr>
         <td style="padding:${c.padding || '32px 40px'};background-color:${c.bg || colors.background};">
-          ${c.headline ? `<h2 style="margin:0 0 12px 0;font-family:${fonts.heading.fallback};font-size:${c.headlineSize || '24px'};color:${c.headlineColor || colors.text};font-weight:700;line-height:1.3;">${c.headline}</h2>` : ''}
-          ${c.body ? `<p style="margin:0;font-family:${fonts.body.fallback};font-size:${c.bodySize || '15px'};color:${c.bodyColor || colors.textLight};line-height:1.7;">${c.body}</p>` : ''}
+          ${c.headline ? `<p style="margin:0 0 12px;font-family:${fonts.heading.fallback};font-size:${c.headlineSize || '22px'};color:${colors.text};font-weight:700;line-height:1.3;">${c.headline}</p>` : ''}
+          ${c.body ? `<p style="margin:0;font-family:${fonts.body.fallback};font-size:${c.bodySize || '20px'};color:${colors.textLight};line-height:1.4;">${c.body}</p>` : ''}
         </td>
       </tr>`
 
@@ -47,27 +197,25 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
       const btnColor = c.buttonColor || colors.buttonText
       const btnText = c.buttonText || 'Saiba Mais'
       const btnUrl = c.buttonUrl || '#'
-      const btnRadius = buttonStyle.borderRadius
       const btnFs = buttonStyle.fontSize
       const btnFw = buttonStyle.fontWeight
       const btnTt = buttonStyle.textTransform
-      const btnPad = buttonStyle.padding
+      const btnRadius = buttonStyle.borderRadius
       return `
-      <!-- CTA -->
       <tr>
         <td align="center" style="padding:${c.padding || '24px 40px'};background-color:${c.bg || colors.background};">
-          ${c.text ? `<p style="margin:0 0 20px;font-family:${fonts.body.fallback};font-size:15px;color:${c.textColor || colors.textLight};text-align:center;">${c.text}</p>` : ''}
+          ${c.text ? `<p style="margin:0 0 16px;font-family:${fonts.body.fallback};font-size:20px;color:${colors.textLight};text-align:center;">${c.text}</p>` : ''}
           <!--[if mso]>
           <v:rect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
             href="${btnUrl}" style="height:49px;v-text-anchor:middle;width:280px;"
-            fillcolor="${btnBg}" strokecolor="${btnBg}" strokeweight="0pt">
+            fillcolor="${btnBg}" stroke="f">
             <w:anchorlock/>
             <center style="color:${btnColor};font-family:Arial,sans-serif;font-size:${btnFs};font-weight:${btnFw};text-transform:${btnTt};white-space:nowrap;">${btnText}</center>
           </v:rect>
           <![endif]-->
           <!--[if !mso]><!-->
           <a href="${btnUrl}" target="_blank"
-            style="white-space:nowrap;background-color:${btnBg};border-radius:${btnRadius};display:inline-block;text-align:center;text-decoration:none;color:${btnColor};font-weight:${btnFw};font-family:${fonts.heading.fallback};font-size:${btnFs};text-transform:${btnTt};line-height:49px;padding:${btnPad};mso-hide:all;-webkit-text-size-adjust:none;">${btnText}</a>
+            style="white-space:nowrap;background-color:${btnBg};border-radius:${btnRadius};display:inline-block;text-align:center;text-decoration:none;color:${btnColor};font-weight:${btnFw};font-family:${fonts.heading.fallback};font-size:${btnFs};text-transform:${btnTt};line-height:49px;padding:${buttonStyle.padding};mso-hide:all;-webkit-text-size-adjust:none;">${btnText}</a>
           <!--<![endif]-->
         </td>
       </tr>`
@@ -75,80 +223,38 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
 
     case 'banner':
       return `
-      <!-- BANNER -->
       <tr>
         <td style="padding:0;font-size:0;line-height:0;">
           <a href="${c.link || '#'}" style="display:block;">
-            <img src="${c.imageUrl || 'https://via.placeholder.com/600x200'}" width="600" alt="${c.alt || 'Banner'}" style="display:block;width:100%;max-width:600px;border:0;"/>
+            <img src="${c.imageUrl || 'https://via.placeholder.com/600x200'}" width="600" alt="${c.alt || ''}" style="display:block;width:100%;max-width:600px;border:0;"/>
           </a>
         </td>
       </tr>`
 
     case 'bannerText':
       return `
-      <!-- BANNER + TEXT -->
       <tr>
         <td style="padding:0;font-size:0;line-height:0;">
-          <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;">
-            <tr>
-              <td width="280" valign="top" style="padding:0;font-size:0;line-height:0;">
-                <img src="${c.imageUrl || 'https://via.placeholder.com/280x240'}" width="280" alt="${c.alt || 'Banner'}" style="display:block;border:0;"/>
-              </td>
-              <td width="320" valign="middle" style="padding:24px;background-color:${c.bg || colors.background};">
-                ${c.headline ? `<h3 style="margin:0 0 12px;font-family:${fonts.heading.fallback};font-size:20px;color:${colors.text};font-weight:700;">${c.headline}</h3>` : ''}
-                ${c.body ? `<p style="margin:0 0 20px;font-family:${fonts.body.fallback};font-size:14px;color:${colors.textLight};line-height:1.6;">${c.body}</p>` : ''}
-                ${c.buttonText ? `<table cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:${buttonStyle.borderRadius};background-color:${colors.buttonBg};"><a href="${c.buttonUrl || '#'}" style="display:inline-block;padding:10px 24px;font-family:${fonts.heading.fallback};font-size:13px;font-weight:700;color:${colors.buttonText};text-decoration:none;border-radius:${buttonStyle.borderRadius};">${c.buttonText}</a></td></tr></table>` : ''}
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>`
-
-    case 'cards':
-      return `
-      <!-- CARDS -->
-      <tr>
-        <td style="padding:32px 20px;background-color:${c.bg || '#F5F5F5'};">
-          ${c.title ? `<h2 style="text-align:center;font-family:${fonts.heading.fallback};font-size:22px;color:${colors.text};margin:0 0 24px;">${c.title}</h2>` : ''}
-          <table width="100%" cellpadding="0" cellspacing="0" border="0">
-            <tr>
-              <td width="33%" valign="top" style="padding:0 8px;">
-                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#fff;border-radius:4px;overflow:hidden;">
-                  <tr><td><img src="${c.card1Image || 'https://via.placeholder.com/170x130'}" width="170" style="display:block;width:100%;border:0;"/></td></tr>
-                  <tr><td style="padding:16px;font-family:${fonts.body.fallback};font-size:13px;color:${colors.text};">${c.card1Text || 'Card 1'}</td></tr>
-                </table>
-              </td>
-              <td width="33%" valign="top" style="padding:0 8px;">
-                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#fff;border-radius:4px;overflow:hidden;">
-                  <tr><td><img src="${c.card2Image || 'https://via.placeholder.com/170x130'}" width="170" style="display:block;width:100%;border:0;"/></td></tr>
-                  <tr><td style="padding:16px;font-family:${fonts.body.fallback};font-size:13px;color:${colors.text};">${c.card2Text || 'Card 2'}</td></tr>
-                </table>
-              </td>
-              <td width="33%" valign="top" style="padding:0 8px;">
-                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#fff;border-radius:4px;overflow:hidden;">
-                  <tr><td><img src="${c.card3Image || 'https://via.placeholder.com/170x130'}" width="170" style="display:block;width:100%;border:0;"/></td></tr>
-                  <tr><td style="padding:16px;font-family:${fonts.body.fallback};font-size:13px;color:${colors.text};">${c.card3Text || 'Card 3'}</td></tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>`
-
-    case 'columns2':
-      return `
-      <!-- 2 COLUMNS -->
-      <tr>
-        <td style="padding:0;">
           <table width="600" cellpadding="0" cellspacing="0" border="0">
             <tr>
               <td width="300" valign="top" style="padding:0;font-size:0;line-height:0;">
-                <img src="${c.col1Image || 'https://via.placeholder.com/300x200'}" width="300" alt="Col 1" style="display:block;border:0;"/>
-                <div style="padding:20px;font-family:${fonts.body.fallback};font-size:14px;color:${colors.text};">${c.col1Text || 'Coluna 1'}</div>
+                <img src="${c.imageUrl || 'https://via.placeholder.com/300x280'}" width="300" alt="${c.alt || ''}" style="display:block;border:0;"/>
               </td>
-              <td width="300" valign="top" style="padding:0;font-size:0;line-height:0;">
-                <img src="${c.col2Image || 'https://via.placeholder.com/300x200'}" width="300" alt="Col 2" style="display:block;border:0;"/>
-                <div style="padding:20px;font-family:${fonts.body.fallback};font-size:14px;color:${colors.text};">${c.col2Text || 'Coluna 2'}</div>
+              <td width="300" valign="middle" style="padding:24px 32px;background-color:${c.bg || colors.background};">
+                ${c.headline ? `<p style="margin:0 0 12px;font-family:${fonts.heading.fallback};font-size:22px;color:${colors.primary};font-weight:700;line-height:1.3;">${c.headline}</p>` : ''}
+                ${c.body ? `<p style="margin:0 0 20px;font-family:${fonts.body.fallback};font-size:16px;color:${colors.text};line-height:1.5;">${c.body}</p>` : ''}
+                ${c.buttonText ? `
+                  <!--[if mso]>
+                  <v:rect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+                    href="${c.buttonUrl || '#'}" style="height:43px;v-text-anchor:middle;width:160px;"
+                    fillcolor="${colors.buttonBg}" stroke="f">
+                    <w:anchorlock/>
+                    <center style="color:${colors.buttonText};font-family:Arial,sans-serif;font-size:${buttonStyle.fontSize};font-weight:${buttonStyle.fontWeight};text-transform:${buttonStyle.textTransform};white-space:nowrap;">${c.buttonText}</center>
+                  </v:rect>
+                  <![endif]-->
+                  <!--[if !mso]><!-->
+                  <a href="${c.buttonUrl || '#'}" target="_blank" style="white-space:nowrap;background-color:${colors.buttonBg};border-radius:${buttonStyle.borderRadius};display:inline-block;text-align:center;text-decoration:none;color:${colors.buttonText};font-weight:${buttonStyle.fontWeight};font-family:${fonts.heading.fallback};font-size:${buttonStyle.fontSize};text-transform:${buttonStyle.textTransform};line-height:43px;padding:0 24px;mso-hide:all;">${c.buttonText}</a>
+                  <!--<![endif]-->` : ''}
               </td>
             </tr>
           </table>
@@ -157,7 +263,6 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
 
     case 'divider':
       return `
-      <!-- DIVIDER -->
       <tr>
         <td style="padding:0 40px;">
           <table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -167,13 +272,10 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
       </tr>`
 
     case 'spacer':
-      return `
-      <!-- SPACER -->
-      <tr><td style="height:${c.height || '24px'};font-size:0;line-height:0;">&nbsp;</td></tr>`
+      return `<tr><td style="height:${c.height || '32px'};font-size:0;line-height:0;">&nbsp;</td></tr>`
 
     case 'footer':
       return `
-      <!-- FOOTER -->
       <tr>
         <td style="padding:0;">
           ${replacePlaceholders(brand.footer.html)}
@@ -187,52 +289,59 @@ function renderBlock(block: EmailBlock, brand: BrandConfig): string {
 
 export function generateHTML(brand: BrandConfig, blocks: EmailBlock[], _assets: Asset[]): string {
   const sortedBlocks = [...blocks].sort((a, b) => a.order - b.order)
-  const blocksHTML = sortedBlocks.map(b => renderBlock(b, brand)).join('\n')
+  const bodyBg = brand.colors.background
 
   return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-BR">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="pt-BR">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="x-apple-disable-message-reformatting"/>
-  <!--[if !mso]><!-->
-  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-  <!--<![endif]-->
-  <title>${brand.displayName} Email</title>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <meta content="telephone=no,address=no,email=no,date=no,url=no" name="format-detection"/>
+  <title>${brand.displayName}</title>
+  <!--[if mso]><style>* { font-family: sans-serif !important; }</style><![endif]-->
+  <!--[if gte mso 9]><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
   <style type="text/css">
-    body { margin:0; padding:0; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
-    table { border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; }
-    img { border:0; height:auto; line-height:100%; outline:none; text-decoration:none; -ms-interpolation-mode:bicubic; }
+    html { margin:0!important; padding:0!important; }
+    * { -ms-text-size-adjust:100%; -webkit-text-size-adjust:100%; }
+    td { vertical-align:top; mso-table-lspace:0pt!important; mso-table-rspace:0pt!important; }
     a { text-decoration:none; }
-    @media only screen and (max-width:600px) {
-      .email-wrapper { width:100% !important; }
-      .responsive-img { width:100% !important; height:auto !important; }
-      .mobile-padding { padding-left:16px !important; padding-right:16px !important; }
-      .hide-mobile { display:none !important; }
+    img { -ms-interpolation-mode:bicubic; }
+    @media only screen and (min-device-width:320px) and (max-device-width:374px) { u~div .email-container { min-width:320px!important; } }
+    @media only screen and (min-device-width:375px) and (max-device-width:413px) { u~div .email-container { min-width:375px!important; } }
+    @media only screen and (min-device-width:414px) { u~div .email-container { min-width:414px!important; } }
+    @media only screen and (max-device-width:599px), only screen and (max-width:599px) {
+      .email-container { width:100%!important; margin:auto!important; }
+      .stack-column { display:block!important; width:100%!important; max-width:100%!important; direction:ltr!important; }
+      .full-width { width:100%!important; }
+      .mobile-center { text-align:center!important; }
+      .hide { display:none!important; }
     }
   </style>
-  <!--[if mso]>
-  <style type="text/css">
-    body, table, td { font-family: Arial, sans-serif !important; }
-  </style>
-  <![endif]-->
 </head>
-<body style="margin:0;padding:0;background-color:#F0F0F0;">
-  <!-- Preheader -->
+<body width="100%" style="margin:0;padding:0!important;mso-line-height-rule:exactly;border:0;">
   <div style="display:none;font-size:1px;color:#F0F0F0;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">&nbsp;</div>
-
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F0F0F0;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
-      <td align="center" style="padding:20px 0;">
-        <!--[if mso]>
-        <table width="600" cellpadding="0" cellspacing="0" border="0"><tr><td>
-        <![endif]-->
-        <table class="email-wrapper" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#FFFFFF;">
-          ${blocksHTML}
+      <td valign="top" align="center">
+        <table bgcolor="${bodyBg}" style="margin:0 auto;" align="center" cellspacing="0" cellpadding="0" border="0" width="600" class="email-container">
+          <tr>
+            <td style="vertical-align:middle;" width="600">
+              <table cellspacing="0" cellpadding="0" border="0" width="100%">
+                ${sortedBlocks.map(b => renderBlock(b, brand)).join('\n')}
+              </table>
+            </td>
+          </tr>
         </table>
-        <!--[if mso]>
-        </td></tr></table>
-        <![endif]-->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;margin:0 auto;">
+          <tr>
+            <td align="center" style="padding:16px 20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#8A8A8A;">
+              Esse email foi enviado para %%emailaddr%%.
+              Caso não queira mais receber nossos emails acesse <a href="%%unsub_center_url%%" style="color:#8A8A8A;text-decoration:underline;">esse link</a>.
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
@@ -240,42 +349,68 @@ export function generateHTML(brand: BrandConfig, blocks: EmailBlock[], _assets: 
 </html>`
 }
 
+// ─── Default blocks per brand ──────────────────────────────────────────────────
+
 export function generateDefaultBlocks(brand: BrandConfig): EmailBlock[] {
   return [
     {
-      id: 'block-header',
-      type: 'header',
-      order: 0,
-      content: { logoUrl: brand.logoUrl, logoWidth: String(brand.logoWidth) },
-    },
-    {
       id: 'block-hero',
       type: 'hero',
-      order: 1,
-      content: { imageUrl: 'https://via.placeholder.com/600x300', link: '#', alt: 'Hero' },
+      order: 0,
+      content: { imageUrl: 'https://via.placeholder.com/600x300', link: '#', alt: brand.displayName },
     },
     {
-      id: 'block-text',
+      id: 'block-cta1',
+      type: 'cta',
+      order: 1,
+      content: { buttonText: 'Saiba Mais', buttonUrl: '#' },
+    },
+    {
+      id: 'block-intro',
       type: 'text',
       order: 2,
-      content: { headline: 'Título Principal', body: 'Insira aqui o texto de introdução do e-mail. Descreva sua oferta de forma clara e objetiva.' },
+      content: { headline: '%Nome%,', body: 'Insira aqui o texto de introdução do e-mail.' },
     },
     {
-      id: 'block-cta',
-      type: 'cta',
+      id: 'block-banner1',
+      type: 'banner',
       order: 3,
-      content: { buttonText: 'Saiba Mais', buttonUrl: '#', text: '' },
+      content: { imageUrl: 'https://via.placeholder.com/600x220', link: '#', alt: 'Banner 1' },
     },
     {
-      id: 'block-banner',
+      id: 'block-banner2',
       type: 'banner',
       order: 4,
-      content: { imageUrl: 'https://via.placeholder.com/600x200', link: '#', alt: 'Banner' },
+      content: { imageUrl: 'https://via.placeholder.com/600x220', link: '#', alt: 'Banner 2' },
+    },
+    {
+      id: 'block-body',
+      type: 'text',
+      order: 5,
+      content: { body: 'Texto complementar da campanha.' },
+    },
+    {
+      id: 'block-cta2',
+      type: 'cta',
+      order: 6,
+      content: { buttonText: 'Saiba Mais', buttonUrl: '#' },
+    },
+    {
+      id: 'block-sidebanner',
+      type: 'bannerText',
+      order: 7,
+      content: {
+        imageUrl: 'https://via.placeholder.com/300x330',
+        headline: `${brand.displayName} — Conheça`,
+        body: 'Seu novo carro com segurança e condições exclusivas.',
+        buttonText: 'Conheça',
+        buttonUrl: '#',
+      },
     },
     {
       id: 'block-footer',
       type: 'footer',
-      order: 5,
+      order: 8,
       content: {},
     },
   ]

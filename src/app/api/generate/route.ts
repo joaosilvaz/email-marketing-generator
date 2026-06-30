@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { generateHTML } from '@/lib/html-generator'
+import { generateFromTemplate } from '@/lib/html-generator'
 import { getBrand } from '@/lib/brands'
 import { getProject, saveProject } from '@/lib/storage'
 import { BrandId, EmailBlock, Asset } from '@/lib/types'
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     const blocks = body.blocks ?? project.blocks
     const assets = body.assets ?? project.assets
 
-    const html = generateHTML(brand, blocks, assets)
+    const html = generateFromTemplate(brand, blocks, assets)
 
     const updated = {
       ...project,
