@@ -64,6 +64,47 @@ Retorne APENAS o JSON, sem markdown, sem comentários, sem truncar a resposta.`
 
 // ─── Parser compartilhado ─────────────────────────────────────────────────────
 
+// A IA às vezes coloca quebras de linha/tabs LITERAIS dentro de strings do JSON
+// (em vez de \n escapado), o que quebra o JSON.parse. Esse sanitizador percorre
+// o texto caractere a caractere, rastreando se está dentro de uma string JSON,
+// e escapa esses caracteres de controle só quando estão dentro de uma string.
+function sanitizeJsonControlChars(text: string): string {
+  let result = ''
+  let inString = false
+  let escaped = false
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i]
+
+    if (inString) {
+      if (escaped) {
+        result += ch
+        escaped = false
+        continue
+      }
+      if (ch === '\\') {
+        result += ch
+        escaped = true
+        continue
+      }
+      if (ch === '"') {
+        inString = false
+        result += ch
+        continue
+      }
+      if (ch === '\n') { result += '\\n'; continue }
+      if (ch === '\r') { continue } // ignora \r solto
+      if (ch === '\t') { result += '\\t'; continue }
+      result += ch
+    } else {
+      if (ch === '"') inString = true
+      result += ch
+    }
+  }
+
+  return result
+}
+
 function parseAIResponse(raw: string): AnalysisResult {
   const cleaned = raw
     .trim()
@@ -72,10 +113,22 @@ function parseAIResponse(raw: string): AnalysisResult {
     .replace(/\n?```$/, '')
     .trim()
 
-  const parsed = JSON.parse(cleaned) as {
+  let parsed: {
     blocks: Array<{ type: string; order: number; content: Record<string, string> }>
     detectedColors?: string[]
     rawDescription?: string
+  }
+
+  try {
+    parsed = JSON.parse(cleaned)
+  } catch {
+    // Resposta com quebras de linha literais dentro de strings — tenta sanitizar
+    try {
+      parsed = JSON.parse(sanitizeJsonControlChars(cleaned))
+    } catch (err2) {
+      const msg = err2 instanceof Error ? err2.message : 'erro desconhecido'
+      throw new Error(`A IA retornou um JSON inválido (${msg}). Tente gerar novamente.`)
+    }
   }
 
   const blocks: EmailBlock[] = parsed.blocks.map((b, i) => ({
