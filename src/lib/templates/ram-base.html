@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="pt-br" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml"
     xmlns:o="urn:schemas-microsoft-com:office:office">
+
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width" name="viewport" />
@@ -11,244 +12,365 @@
     <!--[if mso]> <style> * { font-family: sans-serif !important; } </style> <![endif]-->
     <!--[if gte mso 9]><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
     <style>
-        html { margin:0!important; padding:0!important; }
-        * { -ms-text-size-adjust:100%; -webkit-text-size-adjust:100%; }
-        td { vertical-align:top; mso-table-lspace:0pt!important; mso-table-rspace:0pt!important; }
-        a { text-decoration:none; }
-        img { -ms-interpolation-mode:bicubic; }
-        @media only screen and (max-device-width:599px), only screen and (max-width:599px) {
-            .email-container { width:100%!important; margin:auto!important; }
-            .stack-column { display:block!important; width:100%!important; max-width:100%!important; direction:ltr!important; }
-            .full-width { width:100%!important; }
+        html {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        * {
+            -ms-text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        td {
+            vertical-align: top;
+            mso-table-lspace: 0pt !important;
+            mso-table-rspace: 0pt !important;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        img {
+            -ms-interpolation-mode: bicubic;
+        }
+
+        @media only screen and (max-device-width:599px),
+        only screen and (max-width:599px) {
+            .email-container {
+                width: 100% !important;
+                margin: auto !important;
+            }
+
+            .stack-column {
+                display: block !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                direction: ltr !important;
+            }
+
+            .full-width {
+                width: 100% !important;
+            }
         }
     </style>
 </head>
+
 <body width="100%" style="margin:0;padding:0!important;mso-line-height-rule:exactly;border:0;">
-<div>
-<table width="100%" cellpadding="0" cellspacing="0" border="0">
-<tr><td valign="top" align="center">
-<table bgcolor="#FFFFFF" style="margin:0 auto;" align="center" cellspacing="0" cellpadding="0" border="0" width="600" class="email-container">
-<tr><td style="vertical-align:middle;" width="600">
-<table cellspacing="0" cellpadding="0" border="0" width="100%">
-
-    <!-- ========== HERO IMAGE ========== -->
-    <tr>
-        <td width="600">
-            <table width="100%" border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                    <td width="600">
-                        <img src="{{heroImage}}" width="600" border="0" style="width:100%;height:auto;display:block;">
-                    </td>
-                </tr>
-                <!-- TAGLINE -->
-                <tr>
-                    <td style="padding:16px 0;background-color:#ffffff;">
-                        <p style="margin:0;font-family:Arial,sans-serif;font-size:24px;font-weight:700;color:#918155;text-align:center;text-transform:uppercase;letter-spacing:0.4px;line-height:1.5;">
-                            {{tagline}}
-                        </p>
-                    </td>
-                </tr>
-                <tr><td><div style="line-height:16px;height:16px;font-size:16px">&#8202;</div></td></tr>
-                <!-- CTA IMAGE BUTTON -->
-                <tr>
-                    <td width="600" align="center">
-                        <a href="{{ctaUrl}}" target="_blank" style="border:0;margin:0;padding:0;display:inline-block;">
-                            <img src="{{ctaButtonImage}}" width="385" border="0" style="width:385px;height:auto;display:block;">
-                        </a>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-
-    <!-- SPACER -->
-    <tr><td><div style="line-height:32px;height:32px;font-size:32px">&#8202;</div></td></tr>
-
-    <!-- ========== INTRO TEXT ========== -->
-    <tr>
-        <td style="vertical-align:middle;padding:0 32px;" align="center">
-            <div style="text-align:center;">
-                <span style="color:#000000;font-family:Arial,Arial,sans-serif;font-size:16px;line-height:103%;text-align:center;">
-                    {{introText}}
-                </span>
-            </div>
-        </td>
-    </tr>
-
-    <tr><td><div style="line-height:16px;height:16px;font-size:16px">&#8202;</div></td></tr>
-
-    <!-- ========== PRODUTO + PREÇO + CTA (side by side) ========== -->
-    <tr>
-        <td width="600" align="center" valign="top">
-            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color:#ffffff;">
-                <tr>
-                    <!-- Imagem do veículo -->
-                    <td width="300" class="stack-column" valign="middle" style="padding:20px 15px 20px 0;">
-                        <img src="{{vehicleImage}}" alt="{{vehicleAlt}}" width="280"
-                            style="display:block;max-width:100%;height:auto;">
-                    </td>
-                    <!-- Preço e CTA -->
-                    <td width="300" class="stack-column" valign="middle" style="padding:80px 0 20px 15px;">
-                        <p style="margin:0 0 8px;font-family:Arial,sans-serif;font-size:14px;color:#918155;font-weight:bold;letter-spacing:0.5px;">
-                            {{priceLabel}}
-                        </p>
-                        <p style="margin:0 0 0;font-family:Arial,sans-serif;font-size:26px;font-weight:bold;color:#918155;line-height:1;">
-                            {{price}}
-                        </p>
-                        <p style="margin:0 0 20px;font-family:Arial,sans-serif;font-size:16px;color:#918155;font-weight:normal;">
-                            {{priceSubtitle}}
-                        </p>
-                        <table border="0" cellpadding="0" cellspacing="0">
-                            <tr>
-                                <td style="margin:0;padding:0;" align="center">
-                                    <a href="{{ctaUrl}}" target="_blank" style="border:0;margin:0;padding:0;display:inline-block;">
-                                        <img src="{{ctaProductButtonImage}}" alt="{{ctaProductButtonAlt}}">
-                                    </a>
-                                </td>
-                            </tr>
-                        </table>
-                        <p style="margin:20px 0 0;font-family:Arial,sans-serif;font-size:10px;color:#918155;font-weight:normal;">
-                            {{priceDisclaimer}}
-                        </p>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-
-    <!-- ========== DIVISOR / DESTAQUE ========== -->
-    <tr>
-        <td style="vertical-align:middle;" align="center">
-            <img src="{{dividerImage}}" style="border:0;margin:0;padding:0;display:inline-block;">
-        </td>
-    </tr>
-
-    <tr><td><div style="line-height:16px;height:16px;font-size:16px">&#8202;</div></td></tr>
-
-    <!-- ========== CTA 2 (image button) ========== -->
-    <tr>
-        <td width="600" align="center">
-            <a href="{{ctaUrl}}" target="_blank" style="border:0;margin:0;padding:0;display:inline-block;">
-                <img src="{{ctaButton2Image}}" width="371" border="0" style="width:371px;height:auto;display:block;">
-            </a>
-        </td>
-    </tr>
-
-    <tr><td><div style="line-height:16px;height:16px;font-size:16px">&#8202;</div></td></tr>
-
-    <!-- ========== EXTRA BLOCKS (list, etc) ========== -->
-    {{extraBlocks}}
-
-    <!-- ========== FOOTER ========== -->
-    <!-- Central de Serviços -->
-    <tr>
-        <td width="600" bgcolor="#F9F9F9" align="center"
-            style="color:#000000;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.2;padding:48px 40px 20px;text-align:center;font-weight:bold;">
-            CENTRAL DE SERVIÇOS AO CLIENTE
-        </td>
-    </tr>
-
-    <!-- WhatsApp + Telefone -->
-    <tr>
-        <td width="600" bgcolor="#F9F9F9" align="center">
-            <table width="600" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                    <td align="center" style="padding-top:20px;padding-left:64px;" width="300">
-                        <table cellpadding="0" cellspacing="0" border="0">
-                            <tr>
-                                <td style="vertical-align:middle;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.2;color:#000000;">
-                                    <b>WHATSAPP RAM</b>
-                                    <div style="border-top:2px solid #000000;width:40px;margin:8px 0;font-size:0;line-height:0;">&nbsp;</div>
-                                    <span style="font-size:14px;">(31) 2123-8000</span>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                    <td align="right" style="padding-top:20px;padding-right:64px;" width="300">
-                        <table cellpadding="0" cellspacing="0" border="0">
-                            <tr>
-                                <td style="vertical-align:middle;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.2;color:#000000;">
-                                    <b>TELEFONE</b>
-                                    <div style="border-top:2px solid #000000;width:40px;margin:8px 0;font-size:0;line-height:0;">&nbsp;</div>
-                                    <span style="font-size:14px;">0800 730 7660</span>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-
-    <tr><td bgcolor="#F9F9F9"><div style="line-height:16px;height:16px;font-size:16px">&#8202;</div></td></tr>
-
-    <!-- Divider -->
-    <tr>
-        <td align="center" style="padding:0;" bgcolor="#F9F9F9">
-            <table cellspacing="0" cellpadding="0" border="0" width="480" bgcolor="#F9F9F9">
-                <tr><td width="480" style="border-top:2px solid #000000;font-size:0;line-height:0;">&nbsp;</td></tr>
-            </table>
-        </td>
-    </tr>
-
-    <tr><td bgcolor="#F9F9F9"><div style="line-height:16px;height:16px;font-size:16px">&#8202;</div></td></tr>
-
-    <!-- Redes sociais: FB, YT, IG, LinkedIn -->
-    <tr>
-        <td width="600" bgcolor="#F9F9F9" align="center">
-            <table width="500" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                    <td align="center" style="font-size:0;padding:20px 0;">
-                        <a href="https://www.facebook.com/ramdobrasil" style="display:inline-block;padding:0 32px;" target="_blank">
-                            <img src="https://image.s6.sfmc-content.com/lib/fe931274746c017c76/m/1/769dc7a3-55d3-4d58-af5f-b67779a3a099.png" alt="Facebook" width="40" style="display:block;">
-                        </a>
-                        <a href="https://www.youtube.com/user/RAMdoBrasil" style="display:inline-block;padding:0 32px;" target="_blank">
-                            <img src="https://image.s6.sfmc-content.com/lib/fe931274746c017c76/m/1/e891472b-0531-46c5-8403-644d77e26b99.png" alt="Youtube" width="40" style="display:block;">
-                        </a>
-                        <a href="https://www.instagram.com/ramdobrasil" style="display:inline-block;padding:0 32px;" target="_blank">
-                            <img src="https://image.s6.sfmc-content.com/lib/fe931274746c017c76/m/1/c670c040-9352-4291-8286-87ab6d8666b0.png" alt="Instagram" width="40" style="display:block;">
-                        </a>
-                        <a href="https://www.linkedin.com/company/ram-brasil" style="display:inline-block;padding:0 32px;" target="_blank">
-                            <img src="https://image.s6.sfmc-content.com/lib/fe931274746c017c76/m/1/556b7728-144d-4e4c-8568-31979c263807.png" alt="LinkedIn" width="40" style="display:block;">
-                        </a>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-
-    <!-- IBAMA + logo RAM -->
-    <tr>
-        <td width="600" bgcolor="#F9F9F9">
+    <custom name="open" type="tracking">
+        <div>
             <table width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                    <td align="left" style="padding:20px 32px;">
-                        <span style="font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.3;color:#000000;">Desacelere. Seu bem maior é a vida.</span>
-                    </td>
-                    <td align="right" style="padding:20px 32px;">
-                        <img src="https://image.s6.sfmc-content.com/lib/fe931274746c017c76/m/1/046e06f7-3a85-4d16-9a38-50e12776f53b.png"
-                            alt="RAM" width="162" style="display:block;">
+                    <td valign="top" align="center">
+                        <table bgcolor="#FFFFFF" style="margin:0 auto;" align="center" cellspacing="0" cellpadding="0"
+                            border="0" width="600" class="email-container">
+                            <tr>
+                                <td style="vertical-align:middle;" width="600">
+                                    <table cellspacing="0" cellpadding="0" border="0" width="100%">
+
+                                        <!-- ========== HERO IMAGE ========== -->
+                                        <tr>
+                                            <td width="600">
+                                                <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                                    <tr>
+                                                        <td width="600">
+                                                            <img src="{{heroImage}}" width="600" border="0"
+                                                                style="width:100%;height:auto;display:block;">
+                                                        </td>
+                                                    </tr>
+                                                    <!-- TAGLINE -->
+                                                    <tr>
+                                                        <td style="padding:16px 0;background-color:#ffffff;">
+                                                            <p
+                                                                style="margin:0;font-family:Arial,sans-serif;font-size:24px;font-weight:700;color:{{brandPrimary}};text-align:center;text-transform:uppercase;letter-spacing:0.4px;line-height:1.5;">
+                                                                {{tagline}}
+                                                            </p>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <div style="line-height:16px;height:16px;font-size:16px">
+                                                                &#8202;
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <!-- CTA IMAGE BUTTON -->
+                                                    <tr>
+                                                        <td width="600" align="center">
+                                                            <a href="{{ctaUrl}}" target="_blank"
+                                                                style="border:0;margin:0;padding:0;display:inline-block;">
+                                                                <img src="{{ctaButtonImage}}" width="385" border="0"
+                                                                    style="width:385px;height:auto;display:block;">
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+
+                                        <!-- SPACER -->
+                                        <tr>
+                                            <td>
+                                                <div style="line-height:32px;height:32px;font-size:32px">&#8202;</div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- ========== INTRO TEXT ========== -->
+                                        <tr>
+                                            <td style="vertical-align:middle;padding:0 32px;" align="center">
+                                                <div style="text-align:center;">
+                                                    <span
+                                                        style="color:#000000;font-family:Arial,Arial,sans-serif;font-size:16px;line-height:103%;text-align:center;">
+                                                        {{introText}}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>
+                                                <div style="line-height:16px;height:16px;font-size:16px">&#8202;</div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- ========== PRODUTO + PREÇO + CTA (side by side) ========== -->
+                                        <tr>
+                                            <td width="600" align="center" valign="top">
+                                                <table width="100%" border="0" cellpadding="0" cellspacing="0"
+                                                    style="background-color:#ffffff;">
+                                                    <tr>
+                                                        <!-- Imagem do veículo -->
+                                                        <td width="300" class="stack-column" valign="middle"
+                                                            style="padding:20px 15px 20px 0;">
+                                                            <img src="{{vehicleImage}}" alt="{{vehicleAlt}}" width="280"
+                                                                style="display:block;max-width:100%;height:auto;">
+                                                        </td>
+                                                        <!-- Preço e CTA -->
+                                                        <td width="300" class="stack-column" valign="middle"
+                                                            style="padding:80px 0 20px 15px;">
+                                                            <p
+                                                                style="margin:0 0 8px;font-family:Arial,sans-serif;font-size:14px;color:{{brandPrimary}};font-weight:bold;letter-spacing:0.5px;">
+                                                                {{priceLabel}}
+                                                            </p>
+                                                            <p
+                                                                style="margin:0 0 0;font-family:Arial,sans-serif;font-size:26px;font-weight:bold;color:{{brandPrimary}};line-height:1;">
+                                                                {{price}}
+                                                            </p>
+                                                            <p
+                                                                style="margin:0 0 20px;font-family:Arial,sans-serif;font-size:16px;color:{{brandPrimary}};font-weight:normal;">
+                                                                {{priceSubtitle}}
+                                                            </p>
+                                                            <table border="0" cellpadding="0" cellspacing="0">
+                                                                <tr>
+                                                                    <td style="margin:0;padding:0;" align="center">
+                                                                        <a href="{{ctaUrl}}" target="_blank"
+                                                                            style="border:0;margin:0;padding:0;display:inline-block;">
+                                                                            <img src="{{ctaProductButtonImage}}"
+                                                                                alt="{{ctaProductButtonAlt}}">
+                                                                        </a>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                            <p
+                                                                style="margin:20px 0 0;font-family:Arial,sans-serif;font-size:10px;color:{{brandPrimary}};font-weight:normal;">
+                                                                {{priceDisclaimer}}
+                                                            </p>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+
+                                        <!-- ========== DIVISOR / DESTAQUE ========== -->
+                                        <tr>
+                                            <td style="vertical-align:middle;" align="center">
+                                                <img src="{{dividerImage}}"
+                                                    style="border:0;margin:0;padding:0;display:inline-block;">
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>
+                                                <div style="line-height:16px;height:16px;font-size:16px">&#8202;</div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- ========== CTA 2 (image button) ========== -->
+                                        <tr>
+                                            <td width="600" align="center">
+                                                <a href="{{ctaUrl}}" target="_blank"
+                                                    style="border:0;margin:0;padding:0;display:inline-block;">
+                                                    <img src="{{ctaButton2Image}}" width="371" border="0"
+                                                        style="width:371px;height:auto;display:block;">
+                                                </a>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>
+                                                <div style="line-height:16px;height:16px;font-size:16px">&#8202;</div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- ========== EXTRA BLOCKS (list, etc) ========== -->
+                                        {{extraBlocks}}
+
+                                        <!-- ========== FOOTER ========== -->
+                                        <!-- Central de Serviços -->
+                                        <tr>
+                                            <td width="600" bgcolor="#F9F9F9" align="center"
+                                                style="color:#000000;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.2;padding:48px 40px 20px;text-align:center;font-weight:bold;">
+                                                CENTRAL DE SERVIÇOS AO CLIENTE
+                                            </td>
+                                        </tr>
+
+                                        <!-- WhatsApp + Telefone -->
+                                        <tr>
+                                            <td width="600" bgcolor="#F9F9F9" align="center">
+                                                <table width="600" cellpadding="0" cellspacing="0" border="0">
+                                                    <tr>
+                                                        <td align="center" style="padding-top:20px;padding-left:64px;"
+                                                            width="300">
+                                                            <table cellpadding="0" cellspacing="0" border="0">
+                                                                <tr>
+                                                                    <td
+                                                                        style="vertical-align:middle;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.2;color:#000000;">
+                                                                        <b>WHATSAPP RAM</b>
+                                                                        <div
+                                                                            style="border-top:2px solid #000000;width:40px;margin:8px 0;font-size:0;line-height:0;">
+                                                                            &nbsp;</div>
+                                                                        <span style="font-size:14px;">(31)
+                                                                            2123-8000</span>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                        <td align="right" style="padding-top:20px;padding-right:64px;"
+                                                            width="300">
+                                                            <table cellpadding="0" cellspacing="0" border="0">
+                                                                <tr>
+                                                                    <td
+                                                                        style="vertical-align:middle;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.2;color:#000000;">
+                                                                        <b>TELEFONE</b>
+                                                                        <div
+                                                                            style="border-top:2px solid #000000;width:40px;margin:8px 0;font-size:0;line-height:0;">
+                                                                            &nbsp;</div>
+                                                                        <span style="font-size:14px;">0800 730
+                                                                            7660</span>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td bgcolor="#F9F9F9">
+                                                <div style="line-height:16px;height:16px;font-size:16px">&#8202;</div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Divider -->
+                                        <tr>
+                                            <td align="center" style="padding:0;" bgcolor="#F9F9F9">
+                                                <table cellspacing="0" cellpadding="0" border="0" width="480"
+                                                    bgcolor="#F9F9F9">
+                                                    <tr>
+                                                        <td width="480"
+                                                            style="border-top:2px solid #000000;font-size:0;line-height:0;">
+                                                            &nbsp;</td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td bgcolor="#F9F9F9">
+                                                <div style="line-height:16px;height:16px;font-size:16px">&#8202;</div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Redes sociais: FB, YT, IG, LinkedIn -->
+                                        <tr>
+                                            <td width="600" bgcolor="#F9F9F9" align="center">
+                                                <table width="500" cellpadding="0" cellspacing="0" border="0">
+                                                    <tr>
+                                                        <td align="center" style="font-size:0;padding:20px 0;">
+                                                            <a href="https://www.facebook.com/ramdobrasil"
+                                                                style="display:inline-block;padding:0 32px;"
+                                                                target="_blank">
+                                                                <img src="https://image.s6.sfmc-content.com/lib/fe931274746c017c76/m/1/769dc7a3-55d3-4d58-af5f-b67779a3a099.png"
+                                                                    alt="Facebook" width="40" style="display:block;">
+                                                            </a>
+                                                            <a href="https://www.youtube.com/user/RAMdoBrasil"
+                                                                style="display:inline-block;padding:0 32px;"
+                                                                target="_blank">
+                                                                <img src="https://image.s6.sfmc-content.com/lib/fe931274746c017c76/m/1/e891472b-0531-46c5-8403-644d77e26b99.png"
+                                                                    alt="Youtube" width="40" style="display:block;">
+                                                            </a>
+                                                            <a href="https://www.instagram.com/ramdobrasil"
+                                                                style="display:inline-block;padding:0 32px;"
+                                                                target="_blank">
+                                                                <img src="https://image.s6.sfmc-content.com/lib/fe931274746c017c76/m/1/c670c040-9352-4291-8286-87ab6d8666b0.png"
+                                                                    alt="Instagram" width="40" style="display:block;">
+                                                            </a>
+                                                            <a href="https://www.linkedin.com/company/ram-brasil"
+                                                                style="display:inline-block;padding:0 32px;"
+                                                                target="_blank">
+                                                                <img src="https://image.s6.sfmc-content.com/lib/fe931274746c017c76/m/1/556b7728-144d-4e4c-8568-31979c263807.png"
+                                                                    alt="LinkedIn" width="40" style="display:block;">
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+
+                                        <!-- IBAMA + logo RAM -->
+                                        <tr>
+                                            <td width="600" bgcolor="#F9F9F9">
+                                                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                                    <tr>
+                                                        <td align="left" style="padding:20px 32px;">
+                                                            <span
+                                                                style="font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.3;color:#000000;">Desacelere.
+                                                                Seu bem maior é a vida.</span>
+                                                        </td>
+                                                        <td align="right" style="padding:20px 32px;">
+                                                            <img src="https://image.s6.sfmc-content.com/lib/fe931274746c017c76/m/1/046e06f7-3a85-4d16-9a38-50e12776f53b.png"
+                                                                alt="RAM" width="162" style="display:block;">
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
             </table>
-        </td>
-    </tr>
 
-</table>
-</td></tr>
-</table>
-</td></tr>
-</table>
-
-<!-- Unsubscribe -->
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;margin:0 auto;">
-    <tr>
-        <td align="center" style="padding:24px 20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#8A8A8A;">
-            <p style="margin:0 0 10px;">Esse email foi enviado para %%emailaddr%%.</p>
-            <p style="margin:0 0 10px;">Caso não queira mais receber nossos emails acesse <a href="%%unsub_center_url%%" style="color:#8A8A8A;text-decoration:underline;">esse link</a>.</p>
-        </td>
-    </tr>
-</table>
-</div>
+            <!-- Unsubscribe -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                style="max-width:600px;margin:0 auto;">
+                <tr>
+                    <td align="center"
+                        style="padding:24px 20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#8A8A8A;">
+                        <p style="margin:0 0 10px;">Esse email foi enviado para %%emailaddr%%.</p>
+                        <p style="margin:0 0 10px;">Caso não queira mais receber nossos emails acesse <a
+                                href="%%unsub_center_url%%" style="color:#8A8A8A;text-decoration:underline;">esse
+                                link</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
 </body>
+
 </html>

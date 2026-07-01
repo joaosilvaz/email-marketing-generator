@@ -73,6 +73,7 @@ export async function POST(req: Request) {
     const updated = {
       ...project,
       blocks: result.blocks,
+      detectedColors: result.detectedColors ?? [],
       status: 'ready' as const,
       updatedAt: new Date().toISOString(),
     }

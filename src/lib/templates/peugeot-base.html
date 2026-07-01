@@ -1,299 +1,397 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="pt-br" xml:lang="pt-br">
+
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peugeot</title>
     <style>
         @media screen and (max-width: 600px) {
-            .block { display: block !important; }
-            .full-width { width: 100% !important; }
-            .hide { display: none !important; }
-            .center { text-align: center !important; }
-            .txt { font-size: 28px !important; }
-            .col-txt { max-width: 100% !important; padding: 24px 32px !important; box-sizing: border-box !important; }
-            .txt-title { font-size: 20px !important; line-height: 115% !important; margin-bottom: 10px !important; }
-            .txt-body { font-size: 15px !important; line-height: 120% !important; margin-bottom: 16px !important; }
+            .block {
+                display: block !important;
+            }
+
+            .full-width {
+                width: 100% !important;
+            }
+
+            .hide {
+                display: none !important;
+            }
+
+            .center {
+                text-align: center !important;
+            }
+
+            .txt {
+                font-size: 28px !important;
+            }
+
+            .col-txt {
+                max-width: 100% !important;
+                padding: 24px 32px !important;
+                box-sizing: border-box !important;
+            }
+
+            .txt-title {
+                font-size: 20px !important;
+                line-height: 115% !important;
+                margin-bottom: 10px !important;
+            }
+
+            .txt-body {
+                font-size: 15px !important;
+                line-height: 120% !important;
+                margin-bottom: 16px !important;
+            }
         }
     </style>
 </head>
+
 <body style="border:0;padding:0;margin:0;">
-<table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="600">
-<tr><td>
+    <custom name="open" type="tracking">
+        <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="600">
+            <tr>
+                <td>
 
-    <!-- ========== HEADER IMAGE ========== -->
-    <table bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" class="full-width" width="100%">
-        <tr>
-            <td align="center">
-                <img src="{{headerImage}}" alt="Peugeot" style="border:0;display:block;margin:0;width:100%;">
-            </td>
-        </tr>
-    </table>
+                    <!-- ========== HEADER IMAGE ========== -->
+                    <table bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" class="full-width" width="100%">
+                        <tr>
+                            <td align="center">
+                                <img src="{{headerImage}}" alt="Peugeot"
+                                    style="border:0;display:block;margin:0;width:100%;">
+                            </td>
+                        </tr>
+                    </table>
 
-    <!-- ========== CTA BUTTON 1 ========== -->
-    <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" class="full-width" width="600">
-        <tr>
-            <td align="center" style="vertical-align:middle;padding:16px 0;">
-                <!--[if mso]>
+                    <!-- ========== CTA BUTTON 1 ========== -->
+                    <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0"
+                        class="full-width" width="600">
+                        <tr>
+                            <td align="center" style="vertical-align:middle;padding:16px 0;">
+                                <!--[if mso]>
                 <v:rect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
                     target="_blank" href="{{ctaUrl}}"
                     style="height:55px; v-text-anchor:middle; width:545px;"
-                    fillcolor="#00A3E0" strokecolor="#FFFFFF" strokeweight="1pt">
+                    fillcolor="{{brandPrimary}}" strokecolor="#FFFFFF" strokeweight="1pt">
                     <w:anchorlock/>
                     <center class="txt" style="white-space:nowrap;display:inline-block;text-align:center;text-decoration:none;color:#FFFFFF;font-weight:700;font-family:Arial,Arial,sans-serif;font-size:32px;text-transform:uppercase;">
                         {{ctaText1}}
                     </center>
                 </v:rect>
                 <![endif]-->
-                <!--[if !mso]><!-->
-                <a href="{{ctaUrl}}" target="_blank" class="txt"
-                    style="white-space:nowrap;background-color:#00A3E0;display:inline-block;text-align:center;text-decoration:none;color:#FFFFFF;font-weight:700;font-family:Arial,Arial,sans-serif;font-size:32px;text-transform:uppercase;line-height:55px;width:545px;-webkit-text-size-adjust:none;mso-hide:all">
-                    {{ctaText1}}
-                </a>
-                <!--<![endif]-->
-            </td>
-        </tr>
-    </table>
+                                <!--[if !mso]><!-->
+                                <a href="{{ctaUrl}}" target="_blank" class="txt"
+                                    style="white-space:nowrap;background-color:{{brandPrimary}};display:inline-block;text-align:center;text-decoration:none;color:#FFFFFF;font-weight:700;font-family:Arial,Arial,sans-serif;font-size:32px;text-transform:uppercase;line-height:55px;width:545px;-webkit-text-size-adjust:none;mso-hide:all">
+                                    {{ctaText1}}
+                                </a>
+                                <!--<![endif]-->
+                            </td>
+                        </tr>
+                    </table>
 
-    <!-- ========== INTRO TEXT ========== -->
-    <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" class="full-width" width="600">
-        <tr>
-            <td align="center"
-                style="color:#191919;font-family:Arial,Helvetica,sans-serif;font-size:20px;line-height:1.2;padding:16px 32px 32px;">
-                {{introText}}
-            </td>
-        </tr>
-    </table>
+                    <!-- ========== INTRO TEXT ========== -->
+                    <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0"
+                        class="full-width" width="600">
+                        <tr>
+                            <td align="center"
+                                style="color:#191919;font-family:Arial,Helvetica,sans-serif;font-size:20px;line-height:1.2;padding:16px 32px 32px;">
+                                {{introText}}
+                            </td>
+                        </tr>
+                    </table>
 
-    <!-- ========== BANNER 1 ========== -->
-    <table bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" class="full-width" width="100%">
-        <tr>
-            <td align="center">
-                <a href="{{banner1Url}}" target="_blank">
-                    <img src="{{banner1Image}}" alt="{{banner1Alt}}" style="border:0;display:block;margin:0;width:100%;">
-                </a>
-            </td>
-        </tr>
-    </table>
-    <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="600">
-        <tr><td><div style="line-height:16px;height:16px;font-size:16px">&#8202;</div></td></tr>
-    </table>
+                    <!-- ========== BANNER 1 ========== -->
+                    <table bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" class="full-width" width="100%">
+                        <tr>
+                            <td align="center">
+                                <a href="{{banner1Url}}" target="_blank">
+                                    <img src="{{banner1Image}}" alt="{{banner1Alt}}"
+                                        style="border:0;display:block;margin:0;width:100%;">
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                    <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="600">
+                        <tr>
+                            <td>
+                                <div style="line-height:16px;height:16px;font-size:16px">&#8202;</div>
+                            </td>
+                        </tr>
+                    </table>
 
-    <!-- ========== BANNER 2 ========== -->
-    <table bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" class="full-width" width="100%">
-        <tr>
-            <td align="center">
-                <a href="{{banner2Url}}" target="_blank">
-                    <img src="{{banner2Image}}" alt="{{banner2Alt}}" style="border:0;display:block;margin:0;width:100%;">
-                </a>
-            </td>
-        </tr>
-    </table>
-    <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="600">
-        <tr><td><div style="line-height:16px;height:16px;font-size:16px">&#8202;</div></td></tr>
-    </table>
+                    <!-- ========== BANNER 2 ========== -->
+                    <table bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" class="full-width" width="100%">
+                        <tr>
+                            <td align="center">
+                                <a href="{{banner2Url}}" target="_blank">
+                                    <img src="{{banner2Image}}" alt="{{banner2Alt}}"
+                                        style="border:0;display:block;margin:0;width:100%;">
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                    <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="600">
+                        <tr>
+                            <td>
+                                <div style="line-height:16px;height:16px;font-size:16px">&#8202;</div>
+                            </td>
+                        </tr>
+                    </table>
 
-    <!-- ========== BANNER 3 ========== -->
-    <table bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" class="full-width" width="100%">
-        <tr>
-            <td align="center">
-                <a href="{{banner3Url}}" target="_blank">
-                    <img src="{{banner3Image}}" alt="{{banner3Alt}}" style="border:0;display:block;margin:0;width:100%;">
-                </a>
-            </td>
-        </tr>
-    </table>
-    <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="600">
-        <tr><td><div style="line-height:16px;height:16px;font-size:16px">&#8202;</div></td></tr>
-    </table>
+                    <!-- ========== BANNER 3 ========== -->
+                    <table bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" class="full-width" width="100%">
+                        <tr>
+                            <td align="center">
+                                <a href="{{banner3Url}}" target="_blank">
+                                    <img src="{{banner3Image}}" alt="{{banner3Alt}}"
+                                        style="border:0;display:block;margin:0;width:100%;">
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                    <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="600">
+                        <tr>
+                            <td>
+                                <div style="line-height:16px;height:16px;font-size:16px">&#8202;</div>
+                            </td>
+                        </tr>
+                    </table>
 
-    <!-- ========== BANNER 4 ========== -->
-    <table bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" class="full-width" width="100%">
-        <tr>
-            <td align="center">
-                <a href="{{banner4Url}}" target="_blank">
-                    <img src="{{banner4Image}}" alt="{{banner4Alt}}" style="border:0;display:block;margin:0;width:100%;">
-                </a>
-            </td>
-        </tr>
-    </table>
-    <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="600">
-        <tr><td><div style="line-height:32px;height:32px;font-size:32px">&#8202;</div></td></tr>
-    </table>
+                    <!-- ========== BANNER 4 ========== -->
+                    <table bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" class="full-width" width="100%">
+                        <tr>
+                            <td align="center">
+                                <a href="{{banner4Url}}" target="_blank">
+                                    <img src="{{banner4Image}}" alt="{{banner4Alt}}"
+                                        style="border:0;display:block;margin:0;width:100%;">
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                    <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="600">
+                        <tr>
+                            <td>
+                                <div style="line-height:32px;height:32px;font-size:32px">&#8202;</div>
+                            </td>
+                        </tr>
+                    </table>
 
-    <!-- ========== BANNER + TEXTO (side by side) ========== -->
-    <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" class="full-width" width="600">
-        <tr>
-            <td bgcolor="#ffffff" style="background-color:#ffffff;padding-top:0;">
-                <table width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;">
-                    <tr>
-                        <td class="col-img" width="300" valign="top"
-                            style="width:300px;max-width:300px;font-size:0;line-height:0;">
-                            <img src="{{sideBannerImage}}" width="300" border="0"
-                                style="width:300px;max-width:300px;height:auto;display:block;">
-                        </td>
-                        <td class="col-txt" width="300" valign="middle"
-                            style="width:300px;max-width:300px;padding:8px 32px;vertical-align:middle;background-color:#ffffff;box-sizing:border-box;">
-                            <span class="txt-title"
-                                style="color:#00A3E0;font-family:Arial,sans-serif;font-size:26px;line-height:115%;display:block;margin-bottom:14px;font-weight:400;">
-                                {{sideBannerTitle}}
-                            </span>
-                            <span class="txt-body"
-                                style="color:#252525;font-family:Arial,sans-serif;font-size:18px;line-height:120%;display:block;margin-bottom:24px;">
-                                {{sideBannerText}}
-                            </span>
-                            <div class="btn-wrap" style="text-align:left;">
-                                <!--[if mso]>
+                    <!-- ========== BANNER + TEXTO (side by side) ========== -->
+                    <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0"
+                        class="full-width" width="600">
+                        <tr>
+                            <td bgcolor="#ffffff" style="background-color:#ffffff;padding-top:0;">
+                                <table width="600" cellpadding="0" cellspacing="0" border="0"
+                                    style="width:600px;max-width:600px;">
+                                    <tr>
+                                        <td class="col-img" width="300" valign="top"
+                                            style="width:300px;max-width:300px;font-size:0;line-height:0;">
+                                            <img src="{{sideBannerImage}}" width="300" border="0"
+                                                style="width:300px;max-width:300px;height:auto;display:block;">
+                                        </td>
+                                        <td class="col-txt" width="300" valign="middle"
+                                            style="width:300px;max-width:300px;padding:8px 32px;vertical-align:middle;background-color:#ffffff;box-sizing:border-box;">
+                                            <span class="txt-title"
+                                                style="color:{{brandPrimary}};font-family:Arial,sans-serif;font-size:26px;line-height:115%;display:block;margin-bottom:14px;font-weight:400;">
+                                                {{sideBannerTitle}}
+                                            </span>
+                                            <span class="txt-body"
+                                                style="color:#252525;font-family:Arial,sans-serif;font-size:18px;line-height:120%;display:block;margin-bottom:24px;">
+                                                {{sideBannerText}}
+                                            </span>
+                                            <div class="btn-wrap" style="text-align:left;">
+                                                <!--[if mso]>
                                 <v:rect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
                                     href="{{sideBannerCtaUrl}}"
-                                    style="height:43px; v-text-anchor:middle; width:140px;" fillcolor="#00a3e0" strokecolor="#FFFFFF" strokeweight="1pt">
+                                    style="height:43px; v-text-anchor:middle; width:140px;" fillcolor="{{brandPrimary}}" strokecolor="#FFFFFF" strokeweight="1pt">
                                     <w:anchorlock/>
                                     <center style="white-space:nowrap;display:inline-block;text-align:center;text-decoration:none;color:#ffffff;font-weight:700;font-family:Arial,sans-serif;font-size:16px;text-transform:uppercase;">{{sideBannerCtaText}}</center>
                                 </v:rect>
                                 <![endif]-->
-                                <!--[if !mso]><!-->
-                                <a href="{{sideBannerCtaUrl}}" target="_blank"
-                                    style="mso-hide:all;white-space:nowrap;background-color:#00a3e0;display:inline-block;text-align:center;text-decoration:none;color:#ffffff;font-weight:700;font-family:Arial,sans-serif;font-size:16px;text-transform:uppercase;line-height:43px;width:140px;-webkit-text-size-adjust:none;">{{sideBannerCtaText}}</a>
-                                <!--<![endif]-->
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-    <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="600">
-        <tr><td><div style="line-height:32px;height:32px;font-size:32px">&#8202;</div></td></tr>
-    </table>
+                                                <!--[if !mso]><!-->
+                                                <a href="{{sideBannerCtaUrl}}" target="_blank"
+                                                    style="mso-hide:all;white-space:nowrap;background-color:{{brandPrimary}};display:inline-block;text-align:center;text-decoration:none;color:#ffffff;font-weight:700;font-family:Arial,sans-serif;font-size:16px;text-transform:uppercase;line-height:43px;width:140px;-webkit-text-size-adjust:none;">{{sideBannerCtaText}}</a>
+                                                <!--<![endif]-->
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                    <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="600">
+                        <tr>
+                            <td>
+                                <div style="line-height:32px;height:32px;font-size:32px">&#8202;</div>
+                            </td>
+                        </tr>
+                    </table>
 
-    <!-- ========== EXTRA BLOCKS (list, etc) ========== -->
-    <table bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" class="full-width" width="100%">
-        {{extraBlocks}}
-    </table>
+                    <!-- ========== EXTRA BLOCKS (list, etc) ========== -->
+                    <table bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" class="full-width" width="100%">
+                        {{extraBlocks}}
+                    </table>
 
-    <!-- ========== FOOTER ========== -->
-    <!-- Logo Peugeot -->
-    <table bgcolor="#f5f5f5" border="0" cellpadding="0" cellspacing="0" class="full-width" width="100%">
-        <tr>
-            <td align="center" style="padding:32px;">
-                <img src="https://image.relacionamento.peugeot.com.br/lib/fe3311727564047f761379/m/1/98030793-1a8c-4eaa-99b4-341798b288c9.png"
-                    alt="Logo Peugeot" style="border:0;display:block;margin:0;width:235px;">
-            </td>
-        </tr>
-    </table>
+                    <!-- ========== FOOTER ========== -->
+                    <!-- Logo Peugeot -->
+                    <table bgcolor="#f5f5f5" border="0" cellpadding="0" cellspacing="0" class="full-width" width="100%">
+                        <tr>
+                            <td align="center" style="padding:32px;">
+                                <img src="https://image.relacionamento.peugeot.com.br/lib/fe3311727564047f761379/m/1/98030793-1a8c-4eaa-99b4-341798b288c9.png"
+                                    alt="Logo Peugeot" style="border:0;display:block;margin:0;width:235px;">
+                            </td>
+                        </tr>
+                    </table>
 
-    <!-- Central de Serviços -->
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-        <tr>
-            <td width="600" bgcolor="#f5f5f5" align="center"
-                style="color:#656565;font-family:Arial,Helvetica,sans-serif;font-size:20px;line-height:1.2;padding:20px 40px;text-align:center;font-weight:bold;">
-                CENTRAL DE SERVIÇOS AO CLIENTE
-            </td>
-        </tr>
-        <!-- WhatsApp + Telefone -->
-        <tr>
-            <td width="600" bgcolor="#f5f5f5" align="center">
-                <table width="600" cellpadding="0" cellspacing="0" border="0">
-                    <tr>
-                        <td align="center" style="padding-top:20px;padding-left:64px;" width="300">
-                            <table cellpadding="0" cellspacing="0" border="0">
-                                <tr>
-                                    <td style="vertical-align:middle;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.2;color:#656565;">
-                                        <b>WHATSAPP<br>PEUGEOT</b>
-                                        <div style="border-top:2px solid #656565;width:40px;margin:8px 0;font-size:0;line-height:0;">&nbsp;</div>
-                                        <a href="tel:11989208825" style="color:#656565;font-size:14px;text-decoration:none;">(11) 98920-8825</a>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                        <td align="center" style="padding-top:20px;padding-right:64px;" width="300">
-                            <table cellpadding="0" cellspacing="0" border="0">
-                                <tr>
-                                    <td style="vertical-align:middle;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.2;color:#656565;">
-                                        <b>TELEFONE</b>
-                                        <div style="border-top:2px solid #656565;width:40px;margin:8px 0;font-size:0;line-height:0;">&nbsp;</div>
-                                        <a href="tel:08007032424" style="color:#656565;font-size:14px;text-decoration:none;">0800 703 2424</a>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        <tr><td bgcolor="#f5f5f5"><div style="line-height:32px;height:32px;font-size:32px">&#8202;</div></td></tr>
-        <!-- Divider -->
-        <tr>
-            <td align="center" style="padding:0;" bgcolor="#f5f5f5">
-                <table cellspacing="0" cellpadding="0" border="0" width="480" bgcolor="#f5f5f5">
-                    <tr><td width="480" style="border-top:2px solid #656565;font-size:0;line-height:0;">&nbsp;</td></tr>
-                </table>
-            </td>
-        </tr>
-        <tr><td bgcolor="#f5f5f5"><div style="line-height:16px;height:16px;font-size:16px">&#8202;</div></td></tr>
-        <!-- Redes sociais -->
-        <tr>
-            <td width="600" bgcolor="#f5f5f5" align="center">
-                <table width="500" cellpadding="0" cellspacing="0" border="0">
-                    <tr>
-                        <td align="center" style="font-size:0;padding:20px 0;">
-                            <a href="https://www.facebook.com/peugeotbrasil" style="display:inline-block;padding:0 32px;" target="_blank">
-                                <img src="https://image.s6.sfmc-content.com/lib/fe9912747463077d74/m/1/7721128f-22ba-4cb4-9f2f-770b345e4a18.png" alt="Facebook" width="40" style="display:block;">
-                            </a>
-                            <a href="https://www.youtube.com/peugeotbrasil" style="display:inline-block;padding:0 32px;" target="_blank">
-                                <img src="https://image.s6.sfmc-content.com/lib/fe9912747463077d74/m/1/5994d725-b606-4359-80f4-94995bee3de6.png" alt="Youtube" width="40" style="display:block;">
-                            </a>
-                            <a href="https://www.instagram.com/peugeotbrasil" style="display:inline-block;padding:0 32px;" target="_blank">
-                                <img src="https://image.s6.sfmc-content.com/lib/fe9912747463077d74/m/1/e5cc3198-9f91-4952-863a-ebd386c1335f.png" alt="Instagram" width="40" style="display:block;">
-                            </a>
-                            <a href="https://x.com/peugeotbrasil" style="display:inline-block;padding:0 32px;" target="_blank">
-                                <img src="https://image.s6.sfmc-content.com/lib/fe9912747463077d74/m/1/8d8bc6e1-243e-4110-92fd-cfab774bc0b9.png" alt="X" width="40" style="display:block;">
-                            </a>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        <!-- IBAMA + logo -->
-        <tr>
-            <td width="600" bgcolor="#f5f5f5">
-                <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                    <tr>
-                        <td align="left" style="padding:20px 32px;">
-                            <span style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#191919;">Desacelere. Seu bem maior é a vida.</span>
-                        </td>
-                        <td align="right" style="padding:20px 32px;">
-                            <img src="https://image.relacionamento.peugeot.com.br/lib/fe3311727564047f761379/m/1/22c4fc7e-cad5-40ca-9516-007cf480b999.png"
-                                alt="Peugeot" width="156" style="display:block;">
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
+                    <!-- Central de Serviços -->
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                        <tr>
+                            <td width="600" bgcolor="#f5f5f5" align="center"
+                                style="color:#656565;font-family:Arial,Helvetica,sans-serif;font-size:20px;line-height:1.2;padding:20px 40px;text-align:center;font-weight:bold;">
+                                CENTRAL DE SERVIÇOS AO CLIENTE
+                            </td>
+                        </tr>
+                        <!-- WhatsApp + Telefone -->
+                        <tr>
+                            <td width="600" bgcolor="#f5f5f5" align="center">
+                                <table width="600" cellpadding="0" cellspacing="0" border="0">
+                                    <tr>
+                                        <td align="center" style="padding-top:20px;padding-left:64px;" width="300">
+                                            <table cellpadding="0" cellspacing="0" border="0">
+                                                <tr>
+                                                    <td
+                                                        style="vertical-align:middle;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.2;color:#656565;">
+                                                        <b>WHATSAPP<br>PEUGEOT</b>
+                                                        <div
+                                                            style="border-top:2px solid #656565;width:40px;margin:8px 0;font-size:0;line-height:0;">
+                                                            &nbsp;</div>
+                                                        <a href="tel:11989208825"
+                                                            style="color:#656565;font-size:14px;text-decoration:none;">(11)
+                                                            98920-8825</a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td align="center" style="padding-top:20px;padding-right:64px;" width="300">
+                                            <table cellpadding="0" cellspacing="0" border="0">
+                                                <tr>
+                                                    <td
+                                                        style="vertical-align:middle;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.2;color:#656565;">
+                                                        <b>TELEFONE</b>
+                                                        <div
+                                                            style="border-top:2px solid #656565;width:40px;margin:8px 0;font-size:0;line-height:0;">
+                                                            &nbsp;</div>
+                                                        <a href="tel:08007032424"
+                                                            style="color:#656565;font-size:14px;text-decoration:none;">0800
+                                                            703 2424</a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td bgcolor="#f5f5f5">
+                                <div style="line-height:32px;height:32px;font-size:32px">&#8202;</div>
+                            </td>
+                        </tr>
+                        <!-- Divider -->
+                        <tr>
+                            <td align="center" style="padding:0;" bgcolor="#f5f5f5">
+                                <table cellspacing="0" cellpadding="0" border="0" width="480" bgcolor="#f5f5f5">
+                                    <tr>
+                                        <td width="480" style="border-top:2px solid #656565;font-size:0;line-height:0;">
+                                            &nbsp;</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td bgcolor="#f5f5f5">
+                                <div style="line-height:16px;height:16px;font-size:16px">&#8202;</div>
+                            </td>
+                        </tr>
+                        <!-- Redes sociais -->
+                        <tr>
+                            <td width="600" bgcolor="#f5f5f5" align="center">
+                                <table width="500" cellpadding="0" cellspacing="0" border="0">
+                                    <tr>
+                                        <td align="center" style="font-size:0;padding:20px 0;">
+                                            <a href="https://www.facebook.com/peugeotbrasil"
+                                                style="display:inline-block;padding:0 32px;" target="_blank">
+                                                <img src="https://image.s6.sfmc-content.com/lib/fe9912747463077d74/m/1/7721128f-22ba-4cb4-9f2f-770b345e4a18.png"
+                                                    alt="Facebook" width="40" style="display:block;">
+                                            </a>
+                                            <a href="https://www.youtube.com/peugeotbrasil"
+                                                style="display:inline-block;padding:0 32px;" target="_blank">
+                                                <img src="https://image.s6.sfmc-content.com/lib/fe9912747463077d74/m/1/5994d725-b606-4359-80f4-94995bee3de6.png"
+                                                    alt="Youtube" width="40" style="display:block;">
+                                            </a>
+                                            <a href="https://www.instagram.com/peugeotbrasil"
+                                                style="display:inline-block;padding:0 32px;" target="_blank">
+                                                <img src="https://image.s6.sfmc-content.com/lib/fe9912747463077d74/m/1/e5cc3198-9f91-4952-863a-ebd386c1335f.png"
+                                                    alt="Instagram" width="40" style="display:block;">
+                                            </a>
+                                            <a href="https://x.com/peugeotbrasil"
+                                                style="display:inline-block;padding:0 32px;" target="_blank">
+                                                <img src="https://image.s6.sfmc-content.com/lib/fe9912747463077d74/m/1/8d8bc6e1-243e-4110-92fd-cfab774bc0b9.png"
+                                                    alt="X" width="40" style="display:block;">
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <!-- IBAMA + logo -->
+                        <tr>
+                            <td width="600" bgcolor="#f5f5f5">
+                                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                    <tr>
+                                        <td align="left" style="padding:20px 32px;">
+                                            <span
+                                                style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#191919;">Desacelere.
+                                                Seu bem maior é a vida.</span>
+                                        </td>
+                                        <td align="right" style="padding:20px 32px;">
+                                            <img src="https://image.relacionamento.peugeot.com.br/lib/fe3311727564047f761379/m/1/22c4fc7e-cad5-40ca-9516-007cf480b999.png"
+                                                alt="Peugeot" width="156" style="display:block;">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
 
-    <!-- Legal -->
-    <table align="center" bgcolor="#f5f5f5" border="0" cellpadding="0" cellspacing="0" class="full-width" width="600">
-        <tr>
-            <td align="center"
-                style="color:#191919;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.2;padding:24px 32px;text-align:left;">
-                {{legalText}}
-            </td>
-        </tr>
-    </table>
+                    <!-- Legal -->
+                    <table align="center" bgcolor="#f5f5f5" border="0" cellpadding="0" cellspacing="0"
+                        class="full-width" width="600">
+                        <tr>
+                            <td align="center"
+                                style="color:#191919;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.2;padding:24px 32px;text-align:left;">
+                                {{legalText}}
+                            </td>
+                        </tr>
+                    </table>
 
-    <!-- Unsubscribe -->
-    <table width="600" border="0" cellspacing="0" cellpadding="0" align="center"
-        style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#6e7073;line-height:16px;">
-        <tr>
-            <td align="center" style="padding:10px 20px;">
-                Esse email foi enviado para %%emailaddr%%.<br>
-                Caso não queira mais receber nossos emails acesse <a style="text-decoration:underline;color:#6e7073;" href="%%unsub_center_url%%" alias="Unsubscribe">esse link.</a>
-            </td>
-        </tr>
-    </table>
+                    <!-- Unsubscribe -->
+                    <table width="600" border="0" cellspacing="0" cellpadding="0" align="center"
+                        style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#6e7073;line-height:16px;">
+                        <tr>
+                            <td align="center" style="padding:10px 20px;">
+                                Esse email foi enviado para %%emailaddr%%.<br>
+                                Caso não queira mais receber nossos emails acesse <a
+                                    style="text-decoration:underline;color:#6e7073;" href="%%unsub_center_url%%"
+                                    alias="Unsubscribe">esse link.</a>
+                            </td>
+                        </tr>
+                    </table>
 
-</td></tr>
-</table>
+                </td>
+            </tr>
+        </table>
 </body>
+
 </html>

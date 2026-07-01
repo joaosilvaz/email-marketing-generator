@@ -48,8 +48,14 @@ export function parseFigmaUrl(url: string): { fileKey: string; nodeId?: string }
 
   const fileKey = fileMatch[1]
 
-  const nodeMatch = url.match(/node-id=([a-zA-Z0-9-]+)/)
-  const nodeId = nodeMatch ? nodeMatch[1].replace('-', ':') : undefined
+  // node-id pode vir como "123-456", "123:456" ou URL-encoded "123%3A456"
+  const nodeMatch = url.match(/node-id=([^&#]+)/)
+  let nodeId: string | undefined
+  if (nodeMatch) {
+    nodeId = decodeURIComponent(nodeMatch[1])
+      .replace(/-/g, ':')   // converte hífens em dois-pontos
+      .replace(/::+/g, ':') // remove colons duplicados caso já fosse ":"
+  }
 
   return { fileKey, nodeId }
 }
@@ -61,18 +67,23 @@ async function fetchFigmaNode(fileKey: string, nodeId: string | undefined, token
 
   if (nodeId) {
     const res = await fetch(`https://api.figma.com/v1/files/${fileKey}/nodes?ids=${nodeId}`, { headers })
-    if (!res.ok) throw new Error(`Erro ao buscar nó do Figma: ${res.status} ${res.statusText}`)
-    const data = await res.json() as FigmaNodesResponse
-    const node = data.nodes[nodeId]?.document ?? data.nodes[Object.keys(data.nodes)[0]]?.document
-    if (!node) throw new Error('Nó do Figma não encontrado')
-    return node
+    if (res.ok) {
+      const data = await res.json() as FigmaNodesResponse
+      const node = data.nodes[nodeId]?.document ?? data.nodes[Object.keys(data.nodes)[0]]?.document
+      if (node) return node
+    }
+    // Node ID falhou — tenta o arquivo inteiro como fallback
+    console.warn(`[Figma] Node ${nodeId} retornou ${res.status}, tentando arquivo inteiro...`)
   }
 
   const res = await fetch(`https://api.figma.com/v1/files/${fileKey}`, { headers })
-  if (!res.ok) throw new Error(`Erro ao buscar arquivo do Figma: ${res.status} ${res.statusText}`)
+  if (!res.ok) {
+    if (res.status === 403) throw new Error('Acesso negado ao arquivo do Figma. Verifique se o token tem o escopo "file_content:read" e se você tem acesso ao arquivo.')
+    if (res.status === 404) throw new Error('Arquivo do Figma não encontrado. Verifique se o link está correto e se o arquivo é acessível com sua conta.')
+    throw new Error(`Erro ao buscar arquivo do Figma: ${res.status} ${res.statusText}`)
+  }
   const data = await res.json() as FigmaFileResponse
 
-  // Pega o primeiro FRAME encontrado na primeira página
   const firstPage = data.document.children?.[0]
   const firstFrame = firstPage?.children?.find(c => c.type === 'FRAME') ?? firstPage
   if (!firstFrame) throw new Error('Nenhum frame encontrado no arquivo do Figma')

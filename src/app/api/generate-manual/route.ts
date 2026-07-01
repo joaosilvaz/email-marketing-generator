@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
   try {
     const brand = getBrand(project.brandId as BrandId)
-    const html = generateFromTemplate(brand, body.blocks, body.assets ?? [], body.legalText)
+    const html = generateFromTemplate(brand, body.blocks, body.assets ?? [], body.legalText, project.accentColor || undefined)
 
     const updated = {
       ...project,

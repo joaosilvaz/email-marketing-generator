@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     const blocks = body.blocks ?? project.blocks
     const assets = body.assets ?? project.assets
 
-    const html = generateFromTemplate(brand, blocks, assets)
+    const html = generateFromTemplate(brand, blocks, assets, undefined, project.accentColor || undefined)
 
     const updated = {
       ...project,

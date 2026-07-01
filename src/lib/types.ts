@@ -81,6 +81,8 @@ export interface Project {
   mjmlContent: string
   blocks: EmailBlock[]
   assets: Asset[]
+  detectedColors: string[]
+  accentColor?: string
   version: number
   thumbnail: string
   tags: string[]

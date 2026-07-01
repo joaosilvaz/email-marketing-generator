@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect, useRef, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { Project, EmailBlock } from '@/lib/types'
 import BrandBadge from '@/components/BrandBadge'
@@ -21,41 +21,71 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
   const [saving, setSaving] = useState(false)
   const [tab, setTab] = useState<'preview' | 'blocks' | 'code'>('preview')
   const [saved, setSaved] = useState(false)
+  const [accentColor, setAccentColor] = useState('')
+  const initialLoad = useRef(true)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const projectRef = useRef<Project | null>(null)
+  const blocksRef = useRef<EmailBlock[]>([])
+  const accentColorRef = useRef('')
 
   const load = async () => {
     const res = await fetch(`/api/projects/${id}`)
     if (!res.ok) { router.push('/projects'); return }
     const p = await res.json() as Project
+    projectRef.current = p
     setProject(p)
     setBlocks(p.blocks || [])
+    blocksRef.current = p.blocks || []
     setHtml(p.htmlContent || '')
+    setAccentColor(p.accentColor || '')
+    accentColorRef.current = p.accentColor || ''
     setLoading(false)
   }
 
   useEffect(() => { load() }, [id])
 
-  const generate = async () => {
-    if (!project) return
+  // Mantém ref sincronizada para o auto-generate não ter closure stale
+  useEffect(() => { blocksRef.current = blocks }, [blocks])
+  useEffect(() => { accentColorRef.current = accentColor }, [accentColor])
+
+  // Auto-gera preview 600ms após qualquer mudança nos blocos
+  useEffect(() => {
+    if (initialLoad.current) { initialLoad.current = false; return }
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => generateHtml(false), 600)
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
+  }, [blocks])
+
+  const generateHtml = async (switchTab = false) => {
+    const p = projectRef.current
+    if (!p) return
     setGenerating(true)
     try {
+      await fetch(`/api/projects/${p.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accentColor: accentColorRef.current || null }),
+      })
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectId: project.id, blocks }),
+        body: JSON.stringify({ projectId: p.id, blocks: blocksRef.current }),
       })
       const data = await res.json() as { html: string }
       setHtml(data.html)
-      setTab('preview')
-      await load()
+      if (switchTab) setTab('preview')
     } finally {
       setGenerating(false)
     }
   }
 
+  const generate = () => generateHtml(true)
+
   const save = async () => {
-    if (!project) return
+    const p = projectRef.current
+    if (!p) return
     setSaving(true)
-    await fetch(`/api/projects/${project.id}`, {
+    await fetch(`/api/projects/${p.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ blocks, htmlContent: html }),
@@ -115,6 +145,28 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          {/* Cor de acento */}
+          <div className="flex items-center gap-1.5" title="Cor de destaque — botões e títulos (vazio = cor padrão da marca)">
+            <input
+              type="color"
+              value={accentColor || '#888888'}
+              onChange={e => setAccentColor(e.target.value)}
+              className="w-7 h-7 rounded cursor-pointer border border-zinc-700 bg-transparent p-0.5"
+            />
+            {accentColor && (
+              <button onClick={() => setAccentColor('')} className="text-zinc-500 hover:text-white text-xs">✕</button>
+            )}
+            {/* Chips das cores detectadas pela IA */}
+            {(project?.detectedColors ?? []).filter(c => c && c !== '#000000' && c !== '#ffffff').slice(0, 4).map(c => (
+              <button
+                key={c}
+                onClick={() => setAccentColor(c)}
+                title={c}
+                style={{ backgroundColor: c }}
+                className="w-5 h-5 rounded-full border-2 border-zinc-700 hover:border-white transition-colors"
+              />
+            ))}
+          </div>
           <button
             onClick={generate}
             disabled={generating || blocks.length === 0}

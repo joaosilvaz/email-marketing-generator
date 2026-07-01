@@ -139,6 +139,7 @@ export function generateFromTemplate(
   blocks: EmailBlock[],
   _assets: Asset[],
   legalText?: string,
+  accentColor?: string,
 ): string {
   const tpl = loadBaseTemplate(brand.id)
   if (!tpl) return generateHTML(brand, blocks, _assets)
@@ -251,6 +252,9 @@ export function generateFromTemplate(
     .replace(/\{\{legalText\}\}/g, formatText(legalText || content(blocksByType(sorted, 'footer')[0]).legalText) || brand.legalText || 'Desacelere. Seu bem maior é a vida.')
     .replace(/\{\{year\}\}/g, String(new Date().getFullYear()))
     .replace(/\{\{unsubscribeUrl\}\}/g, '%%unsub_center_url%%')
+
+    // ── Cor de marca (pode ser sobrescrita pela cor detectada no layout) ─────────
+    .replace(/\{\{brandPrimary\}\}/g, accentColor || brand.colors.primary)
 
     // Limpa placeholders não preenchidos
     .replace(/\{\{[a-zA-Z0-9_]+\}\}/g, '')

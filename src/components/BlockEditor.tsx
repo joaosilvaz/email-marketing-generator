@@ -178,15 +178,10 @@ function BlockFieldEditor({
 
 export default function BlockEditor({ blocks, onChange }: Props) {
   const [expanded, setExpanded] = useState<string | null>(null)
+  const [dragId, setDragId] = useState<string | null>(null)
+  const [overId, setOverId] = useState<string | null>(null)
 
-  const moveBlock = (idx: number, dir: -1 | 1) => {
-    const arr = [...blocks]
-    const target = idx + dir
-    if (target < 0 || target >= arr.length) return
-    ;[arr[idx], arr[target]] = [arr[target], arr[idx]]
-    arr.forEach((b, i) => { b.order = i })
-    onChange(arr)
-  }
+  const sorted = [...blocks].sort((a, b) => a.order - b.order)
 
   const removeBlock = (id: string) => {
     onChange(blocks.filter(b => b.id !== id).map((b, i) => ({ ...b, order: i })))
@@ -204,68 +199,97 @@ export default function BlockEditor({ blocks, onChange }: Props) {
       bannerText: { imageUrl: 'https://via.placeholder.com/280x240', headline: 'Título', body: 'Texto', buttonText: 'Ver Mais', buttonUrl: '#' },
       cards: { title: 'Destaques', card1Text: 'Card 1', card2Text: 'Card 2', card3Text: 'Card 3' },
       columns2: { col1Text: 'Coluna 1', col2Text: 'Coluna 2' },
+      list: { title: 'Lista', items: 'Item 1\nItem 2\nItem 3', ordered: 'false' },
       divider: { color: '#E0E0E0' },
       spacer: { height: '24px' },
     }
     const defaultContent: Record<string, string> = defaults[type] ?? {}
+    onChange([...blocks, { id: `block-${Date.now()}`, type, order: blocks.length, content: defaultContent }])
+  }
 
-    const newBlock: EmailBlock = {
-      id: `block-${Date.now()}`,
-      type,
-      order: blocks.length,
-      content: defaultContent,
-    }
-    onChange([...blocks, newBlock])
+  const handleDragStart = (id: string) => {
+    setDragId(id)
+  }
+
+  const handleDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault()
+    if (id !== dragId) setOverId(id)
+  }
+
+  const handleDrop = (targetId: string) => {
+    if (!dragId || dragId === targetId) { setDragId(null); setOverId(null); return }
+    const arr = [...sorted]
+    const fromIdx = arr.findIndex(b => b.id === dragId)
+    const toIdx = arr.findIndex(b => b.id === targetId)
+    const [moved] = arr.splice(fromIdx, 1)
+    arr.splice(toIdx, 0, moved)
+    onChange(arr.map((b, i) => ({ ...b, order: i })))
+    setDragId(null)
+    setOverId(null)
+  }
+
+  const handleDragEnd = () => {
+    setDragId(null)
+    setOverId(null)
   }
 
   return (
     <div className="flex flex-col gap-2">
-      {blocks
-        .slice()
-        .sort((a, b) => a.order - b.order)
-        .map((block, idx) => (
-          <div key={block.id} className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
-            {/* Block header */}
-            <div className="flex items-center gap-2 px-3 py-2.5">
-              <GripVertical size={14} className="text-zinc-600 flex-shrink-0" />
-              <button
-                onClick={() => setExpanded(expanded === block.id ? null : block.id)}
-                className="flex-1 flex items-center justify-between text-left"
-              >
-                <span className="text-sm text-white font-medium">{BLOCK_LABELS[block.type] || block.type}</span>
-                {expanded === block.id ? <ChevronUp size={14} className="text-zinc-500" /> : <ChevronDown size={14} className="text-zinc-500" />}
-              </button>
-              <div className="flex items-center gap-1">
-                <button onClick={() => moveBlock(idx, -1)} disabled={idx === 0} className="p-1 text-zinc-600 hover:text-white disabled:opacity-30"><ChevronUp size={14} /></button>
-                <button onClick={() => moveBlock(idx, 1)} disabled={idx === blocks.length - 1} className="p-1 text-zinc-600 hover:text-white disabled:opacity-30"><ChevronDown size={14} /></button>
-                <button onClick={() => removeBlock(block.id)} className="p-1 text-zinc-600 hover:text-red-400"><Trash2 size={14} /></button>
-              </div>
-            </div>
-
-            {/* Fields */}
-            {expanded === block.id && Object.keys(block.content).length > 0 && (
-              <div className="border-t border-zinc-800">
-                <BlockFieldEditor
-                  content={block.content as Record<string, unknown>}
-                  onChange={c => updateContent(block.id, c)}
-                />
-              </div>
-            )}
+      {sorted.map((block) => (
+        <div
+          key={block.id}
+          draggable
+          onDragStart={() => handleDragStart(block.id)}
+          onDragOver={e => handleDragOver(e, block.id)}
+          onDrop={() => handleDrop(block.id)}
+          onDragEnd={handleDragEnd}
+          className={`bg-zinc-900 border rounded-lg overflow-hidden transition-all ${
+            dragId === block.id
+              ? 'opacity-40 border-zinc-600'
+              : overId === block.id
+              ? 'border-blue-500 shadow-lg shadow-blue-500/20'
+              : 'border-zinc-800'
+          }`}
+        >
+          {/* Block header */}
+          <div className="flex items-center gap-2 px-3 py-2.5">
+            <GripVertical size={14} className="text-zinc-500 flex-shrink-0 cursor-grab active:cursor-grabbing" />
+            <button
+              onClick={() => setExpanded(expanded === block.id ? null : block.id)}
+              className="flex-1 flex items-center justify-between text-left"
+            >
+              <span className="text-sm text-white font-medium">{BLOCK_LABELS[block.type] || block.type}</span>
+              {expanded === block.id ? <ChevronUp size={14} className="text-zinc-500" /> : <ChevronDown size={14} className="text-zinc-500" />}
+            </button>
+            <button onClick={() => removeBlock(block.id)} className="p-1 text-zinc-600 hover:text-red-400">
+              <Trash2 size={14} />
+            </button>
           </div>
-        ))}
+
+          {/* Fields */}
+          {expanded === block.id && Object.keys(block.content).length > 0 && (
+            <div className="border-t border-zinc-800">
+              <BlockFieldEditor
+                content={block.content as Record<string, unknown>}
+                onChange={c => updateContent(block.id, c)}
+              />
+            </div>
+          )}
+        </div>
+      ))}
 
       {/* Add block */}
       <div className="mt-2">
         <p className="text-xs text-zinc-600 mb-2 px-1">Adicionar bloco</p>
         <div className="flex flex-wrap gap-2">
-          {NEW_BLOCK_TYPES.map(type => (
+          {([...NEW_BLOCK_TYPES, 'list'] as EmailBlock['type'][]).map(type => (
             <button
               key={type}
               onClick={() => addBlock(type)}
               className="flex items-center gap-1 px-2.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded text-xs text-zinc-300 transition-colors"
             >
               <Plus size={11} />
-              {BLOCK_LABELS[type]}
+              {BLOCK_LABELS[type] ?? type}
             </button>
           ))}
         </div>
